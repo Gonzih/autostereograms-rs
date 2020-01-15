@@ -29,7 +29,7 @@ pub fn debug() {
     utils::set_panic_hook();
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct Color {
     r: u8,
     g: u8,
@@ -46,6 +46,7 @@ fn separation(z: f32, mu: f32, e: f32) -> i32 {
     ((1.0 - mu * z) * e * (2.0 - mu * z)).round() as i32
 }
 
+#[allow(clippy::needless_range_loop)]
 fn ctx_to_depth_map(ctx: &CanvasRenderingContext2d, w: u32, h: u32) -> Vec<Vec<u8>> {
     let mut result = vec![vec![0; w as usize]; h as usize];
     let image_data = ctx
@@ -84,16 +85,20 @@ pub fn img_to_depth_map(img: &HtmlImageElement, w: u32, h: u32) -> Vec<Vec<u8>> 
     ctx.draw_image_with_html_image_element(img, 0.0, 0.0)
         .unwrap();
 
+    // DEBUG CANVAS
+    document.body().unwrap().append_child(&canvas).unwrap();
+
     ctx_to_depth_map(&ctx, w, h)
 }
 
 #[wasm_bindgen]
-pub fn render_img(img: &HtmlImageElement, ctx: &CanvasRenderingContext2d) {
-    let depth_map = img_to_depth_map(img, 256, 256);
-    render(depth_map, ctx);
+pub fn render_img(img: &HtmlImageElement, ctx: &CanvasRenderingContext2d, w: u32, h: u32) {
+    let depth_map = img_to_depth_map(img, w, h);
+    render(depth_map, ctx, w, h);
 }
 
-pub fn render(depth_map: Vec<Vec<u8>>, ctx: &CanvasRenderingContext2d) {
+#[allow(clippy::needless_range_loop)]
+pub fn render(depth_map: Vec<Vec<u8>>, ctx: &CanvasRenderingContext2d, w: u32, h: u32) {
     let colors = vec![
         Color::new(0, 0, 0),
         Color::new(255, 0, 0),
@@ -105,31 +110,46 @@ pub fn render(depth_map: Vec<Vec<u8>>, ctx: &CanvasRenderingContext2d) {
     let e = (dpi as f32 * 2.5).round();
     let mu = 1.0 / 3.0;
     // let far = separation(0.0, mu, e);
-    let width = 256;
-    let height = 256;
+    let width = w as usize;
+    let height = h as usize;
 
-    let mut pixels = vec![vec![Color::new(0, 0, 0); height]; width];
+    let rng = &mut rand::thread_rng();
+
+    for _ in 0..5 {
+        let color = colors
+            .choose(rng)
+            .expect("Could not get random color")
+            .clone();
+        log!("chose random color: {:?}", color);
+    }
+
+    let mut pixels = vec![vec![colors[0].clone(); height]; width];
 
     for y in 0..height {
-        let mut pix = vec![0; width];
+        let mut pix = vec![colors[0].clone(); width];
         let mut same = vec![0; width];
 
         for x in 0..width {
-            let depth = depth_map[x][y] as f32;
-            let sep = separation(depth, mu, e);
+            same[x] = x as i32;
+        }
+
+        for x in 0..width {
+            let z = depth_map[x][y] as f32;
+            let sep = separation(z, mu, e);
             let mut left = x as i32 - (sep + (sep & y as i32 & 1)) / 2;
             let mut right = left + sep;
 
-            if 0 <= left && right < width as i32 {
+            if 0 <= left as i32 && right < width as i32 {
                 let mut t = 1;
                 let mut visible;
 
                 loop {
-                    let zt = depth + 2.0 * (2.0 - mu * depth) * t as f32 / (mu * e);
+                    let zt = z + 2.0 * (2.0 - mu * z) * t as f32 / (mu * e);
                     visible =
-                        (depth_map[y][x - t] as f32) < zt && (depth_map[y][x + t] as f32) < zt;
+                        (depth_map[x - t][y] as f32) < zt && (depth_map[x + t][y] as f32) < zt;
                     t += 1;
 
+                    // log!("zt: {}, visible: {}, t: {}", zt, visible, tt);
                     if !(visible && zt < 1.0) {
                         break;
                     }
@@ -137,7 +157,15 @@ pub fn render(depth_map: Vec<Vec<u8>>, ctx: &CanvasRenderingContext2d) {
 
                 if visible {
                     let k = same[left as usize];
-                    while k != left && k != right {
+                    if k != left && k != right {
+                        // log!(
+                        //     "k({}) != left({}) && k({}) != right({}) >>>>> {}",
+                        //     k,
+                        //     left,
+                        //     k,
+                        //     right,
+                        //     k != left && k != right
+                        // );
                         if k < right {
                             left = k;
                         } else {
@@ -145,20 +173,25 @@ pub fn render(depth_map: Vec<Vec<u8>>, ctx: &CanvasRenderingContext2d) {
                             right = k;
                         }
                     }
-                    same[left as usize] = right;
+
+                    // same[left as usize] = right;
                 }
             }
 
             for x in (width - 1)..0 {
-                if same[x] == x as i32 {
-                    pix[x] = 1;
-                } else {
-                    pix[x] = pix[same[x] as usize];
-                }
-                pixels[y][x] = colors
-                    .choose(&mut rand::thread_rng())
+                // log!("same x: {}", same[x]);
+                // if same[x] == x as i32 {
+                // THIS IS NEVER EXECUTED
+                pix[x] = colors
+                    .choose(rng)
                     .expect("Could not get random color")
                     .clone();
+                // log!("random choise: {:?}", pix[x]);
+                // } else {
+                // pix[x] = pix[same[x] as usize].clone();
+                // }
+
+                pixels[x][y] = pix[x].clone();
             }
         }
         // draw_circle(width/2-far/2, height*19/20);
@@ -169,8 +202,10 @@ pub fn render(depth_map: Vec<Vec<u8>>, ctx: &CanvasRenderingContext2d) {
 
     for y in 0..height {
         for x in 0..width {
-            let color = &pixels[y][x];
+            // let color = &pixels[x][y];
+            let color = &colors.choose(rng).expect("Could not get random color");
             let offset = (y * width * 4) + (x * 4);
+            // log!("Set color to {:?}", color);
             pixel_data[offset] = color.r;
             pixel_data[offset + 1] = color.g;
             pixel_data[offset + 2] = color.b;
