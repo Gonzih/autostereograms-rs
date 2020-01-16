@@ -187,22 +187,16 @@ pub fn generate_pixel_data(depth_map: DepthMap, w: u32, h: u32, dpi: u32) -> Vec
                 }
 
                 if visible {
-                    for _ in 0..6 {
-                        let k = same[left as usize];
-                        // juggle pointers until
-                        // either
-                        // same[left] == left or
-                        // same[right] == left
-                        if k != left && k != right {
-                            if k < right {
-                                left = k;
-                            } else {
-                                left = right;
-                                right = k;
-                            }
+                    let mut k = same[left as usize];
+                    while k != left && k != right {
+                        if k < right {
+                            left = k;
                         } else {
-                            break;
+                            left = right;
+                            right = k;
                         }
+
+                        k = same[left as usize];
                     }
 
                     // record the same color
