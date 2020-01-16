@@ -32,10 +32,10 @@ pub fn debug() {
 }
 
 #[derive(Clone, Debug)]
-struct Color {
-    r: u8,
-    g: u8,
-    b: u8,
+pub struct Color {
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
 }
 
 impl Color {
@@ -115,7 +115,7 @@ pub fn img_to_depth_map(img: &HtmlImageElement, w: u32, h: u32, inverted: bool) 
     ctx_to_depth_map(&ctx, w, h, inverted)
 }
 
-pub fn reset_canvas(ctx: &CanvasRenderingContext2d, mut pixel_data: Vec<u8>, w: u32, h: u32) {
+fn reset_canvas(ctx: &CanvasRenderingContext2d, mut pixel_data: Vec<u8>, w: u32, h: u32) {
     let image_data = ImageData::new_with_u8_clamped_array_and_sh(Clamped(&mut pixel_data), w, h)
         .expect("Could not create image data");
 
@@ -125,6 +125,15 @@ pub fn reset_canvas(ctx: &CanvasRenderingContext2d, mut pixel_data: Vec<u8>, w: 
     log!("Finished rendering!");
 }
 
+fn gen_colors(n: u32) -> Vec<Color> {
+    let mut colors = vec![];
+    for _ in 0..n {
+        colors.push(Color::random());
+    }
+
+    colors
+}
+
 #[wasm_bindgen]
 pub fn render_canvas(
     canvas: &HtmlCanvasElement,
@@ -132,9 +141,10 @@ pub fn render_canvas(
     w: u32,
     h: u32,
     inverted: bool,
+    n_colors: u32,
 ) {
     let depth_map = canvas_to_depth_map(canvas, w, h, inverted);
-    let pixel_data = generate_pixel_data(depth_map, w, h, DPI);
+    let pixel_data = generate_pixel_data(depth_map, w, h, DPI, gen_colors(n_colors));
     reset_canvas(ctx, pixel_data, w, h);
 }
 
@@ -145,9 +155,10 @@ pub fn render_img(
     w: u32,
     h: u32,
     inverted: bool,
+    n_colors: u32,
 ) {
     let depth_map = img_to_depth_map(img, w, h, inverted);
-    let pixel_data = generate_pixel_data(depth_map, w, h, DPI);
+    let pixel_data = generate_pixel_data(depth_map, w, h, DPI, gen_colors(n_colors));
     reset_canvas(ctx, pixel_data, w, h);
 }
 
@@ -156,20 +167,18 @@ pub fn render_img(
 /// https://www2.cs.sfu.ca/CourseCentral/414/li/material/refs/SIRDS-Computer-94.pdf
 /// this also uses this library as a working reference with canvas and img tags
 /// https://github.com/peeinears/MagicEye.js
-pub fn generate_pixel_data(depth_map: DepthMap, w: u32, h: u32, dpi: u32) -> Vec<u8> {
-    let colors = vec![
-        Color::random(),
-        Color::random(),
-        Color::random(),
-        Color::random(),
-    ];
+pub fn generate_pixel_data(
+    depth_map: DepthMap,
+    w: u32,
+    h: u32,
+    dpi: u32,
+    colors: Vec<Color>,
+) -> Vec<u8> {
     let e = (dpi as f32 * 2.5).round();
     let mu = 1.0 / 3.0;
     // let far = separation(0.0, mu, e);
     let width = w as usize;
     let height = h as usize;
-
-    let rng = &mut rand::thread_rng();
 
     let mut pixel_data = vec![0_u8; width * height * 4];
 
@@ -227,14 +236,11 @@ pub fn generate_pixel_data(depth_map: DepthMap, w: u32, h: u32, dpi: u32) -> Vec
             }
 
             for x in (0..width).rev() {
-                // log!("same x: {}", same[x]);
                 if same[x] == x as i32 {
                     pix[x] = colors
-                        .choose(rng)
+                        .choose(&mut rand::thread_rng())
                         .expect("Could not get random color")
                         .clone();
-                // THIS IS NEVER EXECUTED
-                // log!("random choise: {:?}", pix[x]);
                 } else {
                     pix[x] = pix[same[x] as usize].clone();
                 }
