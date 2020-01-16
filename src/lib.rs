@@ -182,12 +182,12 @@ pub fn generate_pixel_data(
 
     let mut pixel_data = vec![0_u8; width * height * 4];
 
-    for y in 0..height {
-        // color of this given pixel
-        let mut pix = vec![colors[0].clone(); width];
-        // points to a pixels on the right that is constrained to be this color
-        let mut same = vec![0_i32; width];
+    // color of this given pixel
+    let mut pix = vec![colors[0].clone(); width];
+    // points to a pixels on the right that is constrained to be this color
+    let mut same = vec![0_i32; width];
 
+    for y in 0..height {
         for x in 0..width {
             // each pixel is initially linked with itself
             same[x] = x as i32;
