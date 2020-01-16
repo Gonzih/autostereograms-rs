@@ -1,7 +1,7 @@
 mod utils;
 
 use rand::seq::SliceRandom;
-// use rand::Rng;
+use rand::Rng;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::Clamped;
 use wasm_bindgen::JsCast;
@@ -41,6 +41,15 @@ struct Color {
 impl Color {
     fn new(r: u8, g: u8, b: u8) -> Self {
         Color { r, g, b }
+    }
+
+    fn random() -> Self {
+        let rng = &mut rand::thread_rng();
+        Self::new(
+            rng.gen_range(0, 255),
+            rng.gen_range(0, 255),
+            rng.gen_range(0, 255),
+        )
     }
 }
 
@@ -149,11 +158,10 @@ pub fn render_img(
 /// https://github.com/peeinears/MagicEye.js
 pub fn generate_pixel_data(depth_map: DepthMap, w: u32, h: u32, dpi: u32) -> Vec<u8> {
     let colors = vec![
-        Color::new(0, 0, 0),
-        // Color::new(255, 0, 0),
-        // Color::new(0, 255, 0),
-        // Color::new(0, 0, 255),
-        Color::new(255, 255, 255),
+        Color::random(),
+        Color::random(),
+        Color::random(),
+        Color::random(),
     ];
     let e = (dpi as f32 * 2.5).round();
     let mu = 1.0 / 3.0;
