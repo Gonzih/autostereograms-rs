@@ -9,6 +9,7 @@ release:
 	cd www && npm run build
 	rm docs -rf
 	cp -r www/dist docs
+	cp -r www/samples docs/
 
 npm-install:
 	cd www && npm install
