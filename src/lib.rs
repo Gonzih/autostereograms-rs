@@ -58,9 +58,9 @@ fn ctx_to_depth_map(ctx: &CanvasRenderingContext2d, w: u32, h: u32, inverted: bo
         .expect("Could not get image data")
         .data();
 
-    for y in 0..(w as usize) {
+    for y in 0..(h as usize) {
         let offset = (w * y as u32 * 4) as usize;
-        for x in 0..(h as usize) {
+        for x in 0..(w as usize) {
             result[y][x] = image_data[offset + (x as usize * 4)] as f32 / 255.0;
             if inverted {
                 result[y][x] = 1.0 - result[y][x];
