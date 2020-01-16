@@ -27,7 +27,7 @@ extern "C" {}
 
 #[wasm_bindgen]
 pub fn debug() {
-    log!("Enadling panic hook");
+    log!("Enabling panic hook");
     utils::set_panic_hook();
 }
 
@@ -51,7 +51,7 @@ fn separation(z: f32, mu: f32, e: f32) -> i32 {
 type DepthMap = Vec<Vec<f32>>;
 
 #[allow(clippy::needless_range_loop)]
-fn ctx_to_depth_map(ctx: &CanvasRenderingContext2d, w: u32, h: u32) -> DepthMap {
+fn ctx_to_depth_map(ctx: &CanvasRenderingContext2d, w: u32, h: u32, inverted: bool) -> DepthMap {
     let mut result: DepthMap = vec![vec![1.0; w as usize]; h as usize];
     let image_data = ctx
         .get_image_data(0.0, 0.0, w as f64, h as f64)
@@ -61,14 +61,17 @@ fn ctx_to_depth_map(ctx: &CanvasRenderingContext2d, w: u32, h: u32) -> DepthMap 
     for y in 0..(w as usize) {
         let offset = (w * y as u32 * 4) as usize;
         for x in 0..(h as usize) {
-            result[y][x] = 1.0 - image_data[offset + (x as usize * 4)] as f32 / 255.0;
+            result[y][x] = image_data[offset + (x as usize * 4)] as f32 / 255.0;
+            if inverted {
+                result[y][x] = 1.0 - result[y][x];
+            }
         }
     }
 
     result
 }
 
-pub fn canvas_to_depth_map(canvas: &HtmlCanvasElement, w: u32, h: u32) -> DepthMap {
+pub fn canvas_to_depth_map(canvas: &HtmlCanvasElement, w: u32, h: u32, inverted: bool) -> DepthMap {
     let ctx = canvas
         .get_context("2d")
         .unwrap()
@@ -76,10 +79,10 @@ pub fn canvas_to_depth_map(canvas: &HtmlCanvasElement, w: u32, h: u32) -> DepthM
         .dyn_into::<web_sys::CanvasRenderingContext2d>()
         .unwrap();
 
-    ctx_to_depth_map(&ctx, w, h)
+    ctx_to_depth_map(&ctx, w, h, inverted)
 }
 
-pub fn img_to_depth_map(img: &HtmlImageElement, w: u32, h: u32) -> DepthMap {
+pub fn img_to_depth_map(img: &HtmlImageElement, w: u32, h: u32, inverted: bool) -> DepthMap {
     let document = web_sys::window().unwrap().document().unwrap();
     let canvas = document
         .create_element("canvas")
@@ -100,7 +103,7 @@ pub fn img_to_depth_map(img: &HtmlImageElement, w: u32, h: u32) -> DepthMap {
     ctx.draw_image_with_html_image_element(img, 0.0, 0.0)
         .unwrap();
 
-    ctx_to_depth_map(&ctx, w, h)
+    ctx_to_depth_map(&ctx, w, h, inverted)
 }
 
 pub fn reset_canvas(ctx: &CanvasRenderingContext2d, mut pixel_data: Vec<u8>, w: u32, h: u32) {
@@ -114,15 +117,27 @@ pub fn reset_canvas(ctx: &CanvasRenderingContext2d, mut pixel_data: Vec<u8>, w: 
 }
 
 #[wasm_bindgen]
-pub fn render_canvas(canvas: &HtmlCanvasElement, ctx: &CanvasRenderingContext2d, w: u32, h: u32) {
-    let depth_map = canvas_to_depth_map(canvas, w, h);
+pub fn render_canvas(
+    canvas: &HtmlCanvasElement,
+    ctx: &CanvasRenderingContext2d,
+    w: u32,
+    h: u32,
+    inverted: bool,
+) {
+    let depth_map = canvas_to_depth_map(canvas, w, h, inverted);
     let pixel_data = generate_pixel_data(depth_map, w, h, DPI);
     reset_canvas(ctx, pixel_data, w, h);
 }
 
 #[wasm_bindgen]
-pub fn render_img(img: &HtmlImageElement, ctx: &CanvasRenderingContext2d, w: u32, h: u32) {
-    let depth_map = img_to_depth_map(img, w, h);
+pub fn render_img(
+    img: &HtmlImageElement,
+    ctx: &CanvasRenderingContext2d,
+    w: u32,
+    h: u32,
+    inverted: bool,
+) {
+    let depth_map = img_to_depth_map(img, w, h, inverted);
     let pixel_data = generate_pixel_data(depth_map, w, h, DPI);
     reset_canvas(ctx, pixel_data, w, h);
 }
@@ -135,9 +150,9 @@ pub fn render_img(img: &HtmlImageElement, ctx: &CanvasRenderingContext2d, w: u32
 pub fn generate_pixel_data(depth_map: DepthMap, w: u32, h: u32, dpi: u32) -> Vec<u8> {
     let colors = vec![
         Color::new(0, 0, 0),
-        Color::new(255, 0, 0),
-        Color::new(0, 255, 0),
-        Color::new(0, 0, 255),
+        // Color::new(255, 0, 0),
+        // Color::new(0, 255, 0),
+        // Color::new(0, 0, 255),
         Color::new(255, 255, 255),
     ];
     let e = (dpi as f32 * 2.5).round();
@@ -181,7 +196,6 @@ pub fn generate_pixel_data(depth_map: DepthMap, w: u32, h: u32, dpi: u32) -> Vec
                     t += 1;
 
                     if !visible || zt >= 1.0 {
-                        // log!("zt: {}, visible: {}, t: {}", zt, visible, t);
                         break;
                     }
                 }
