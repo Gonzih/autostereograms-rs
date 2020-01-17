@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Publish
-      run: nix-shell shell.nix --run 'make setup public release setup-git commit'
+      run: nix-shell shell.nix --run 'make setup public npm-install release setup-git commit'
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
         GIT_NAME: Max Gonzih via GH Actions
