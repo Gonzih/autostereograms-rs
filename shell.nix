@@ -1,6 +1,6 @@
 with import <nixpkgs> {};
 pkgs.mkShell {
   buildInputs = [
-    gnumake rustup wasm-pack nodejs
+    gnumake rustup wasm-pack nodejs git
   ];
 }

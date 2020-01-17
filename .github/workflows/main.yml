@@ -1,13 +1,18 @@
 name: CI
 
-on: [push]
+on:
+  push:
+    branches:
+    - master
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
+    container:
+      image: "nixos/nix"
 
     steps:
     - uses: actions/checkout@v2
-    - name: Release
+    - name: Publish
       run: nix-shell --run 'make setup public release commit'
