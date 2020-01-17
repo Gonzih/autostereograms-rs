@@ -29,6 +29,10 @@ public:
 setup:
 	rustup default nightly
 
+setup-git:
+	git config --global user.email "$(GIT_EMAIL)"
+	git config --global user.name "$(GIT_NAME)"
+
 commit:
 	cd public \
 	&& git add  . \
