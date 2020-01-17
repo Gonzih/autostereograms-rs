@@ -172,17 +172,13 @@ pub fn render_img(
     inverted: bool,
     n_colors: u32,
 ) {
-    let t = performance_now();
     let depth_map = img_to_depth_map(img, w, h, inverted);
-    log_performance("Depth map generation", t);
 
     let t = performance_now();
     let pixel_data = generate_pixel_data(depth_map, w, h, DPI, gen_colors(n_colors));
     log_performance("Pixel data generation", t);
 
-    let t = performance_now();
     reset_canvas(ctx, pixel_data, w, h);
-    log_performance("Updating canvas", t);
 }
 
 #[allow(clippy::needless_range_loop)]
