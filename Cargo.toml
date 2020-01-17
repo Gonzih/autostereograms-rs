@@ -33,6 +33,7 @@ features = [
   "console",
   'CanvasRenderingContext2d',
   'Window',
+  'Performance',
   'ImageData',
   'Document',
   'Node',

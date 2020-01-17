@@ -2,6 +2,7 @@ mod utils;
 
 use rand::seq::SliceRandom;
 use rand::Rng;
+use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::Clamped;
 use wasm_bindgen::JsCast;
@@ -15,6 +16,27 @@ macro_rules! log {
         web_sys::console::log_1(&format!( $( $t )* ).into());
     }
 }
+
+fn performance_now() -> f64 {
+    web_sys::window()
+        .expect("Could not get window")
+        .performance()
+        .expect("performance should be available")
+        .now()
+}
+
+fn log_performance(label: &'static str, since: f64) {
+    let t = performance_now();
+    log!("{} took {}ms", label, t - since);
+}
+
+// macro_rules! measure {
+//     ( $label:expr => { $( $c:expr )* } ) => {
+//         let t = performance_now();
+//         $( $c )*
+//         log_performance($label, t);
+//     };
+// }
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -125,10 +147,10 @@ fn reset_canvas(ctx: &CanvasRenderingContext2d, mut pixel_data: Vec<u8>, w: u32,
     log!("Finished rendering!");
 }
 
-fn gen_colors(n: u32) -> Vec<Color> {
+fn gen_colors(n: u32) -> Vec<Rc<Color>> {
     let mut colors = vec![];
     for _ in 0..n {
-        colors.push(Color::random());
+        colors.push(Rc::new(Color::random()));
     }
 
     colors
@@ -172,7 +194,7 @@ pub fn generate_pixel_data(
     w: u32,
     h: u32,
     dpi: u32,
-    colors: Vec<Color>,
+    colors: Vec<Rc<Color>>,
 ) -> Vec<u8> {
     let e = (dpi as f32 * 2.5).round();
     let mu = 1.0 / 3.0;
@@ -186,6 +208,8 @@ pub fn generate_pixel_data(
     let mut pix = vec![colors[0].clone(); width];
     // points to a pixels on the right that is constrained to be this color
     let mut same = vec![0_i32; width];
+
+    let rng = &mut rand::thread_rng();
 
     for y in 0..height {
         for x in 0..width {
@@ -237,12 +261,9 @@ pub fn generate_pixel_data(
 
             for x in (0..width).rev() {
                 if same[x] == x as i32 {
-                    pix[x] = colors
-                        .choose(&mut rand::thread_rng())
-                        .expect("Could not get random color")
-                        .clone();
+                    pix[x] = Rc::clone(&colors.choose(rng).expect("Colud not get random color"));
                 } else {
-                    pix[x] = pix[same[x] as usize].clone();
+                    pix[x] = Rc::clone(&pix[same[x] as usize]);
                 }
 
                 let color = &pix[x];
