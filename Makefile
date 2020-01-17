@@ -28,4 +28,4 @@ public:
 	git clone -b gh-pages $(PUBLIC_URL) public
 
 setup:
-	rustup default nighly
+	rustup default nightly
