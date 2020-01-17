@@ -1,6 +1,9 @@
 build:
 	wasm-pack build
 
+cargo-watch-build:
+	cargo watch -w src/ -s 'make build'
+
 TARGET_FILE := pkg/autostereograms_rs_bg.wasm
 release:
 	wasm-pack build --release
