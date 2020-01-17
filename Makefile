@@ -18,7 +18,6 @@ npm-install:
 serve:
 	cd www && npm run start
 
-TS := $(date)
 ifdef GH_TOKEN
 PUBLIC_URL = https://$(GH_TOKEN)@github.com/Gonzih/autostereograms-rs.git
 else
@@ -29,3 +28,9 @@ public:
 
 setup:
 	rustup default nightly
+
+commit:
+	cd public \
+	&& git add  . \
+	&& (git commit -a -m "Website updated at $(shell date)"  || echo "Nothing to commit") \
+	&& git push
