@@ -23,20 +23,13 @@ fn performance_now() -> f64 {
         .performance()
         .expect("performance should be available")
         .now()
+        .round()
 }
 
 fn log_performance(label: &'static str, since: f64) {
     let t = performance_now();
     log!("{} took {}ms", label, t - since);
 }
-
-// macro_rules! measure {
-//     ( $label:expr => { $( $c:expr )* } ) => {
-//         let t = performance_now();
-//         $( $c )*
-//         log_performance($label, t);
-//     };
-// }
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -179,9 +172,17 @@ pub fn render_img(
     inverted: bool,
     n_colors: u32,
 ) {
+    let t = performance_now();
     let depth_map = img_to_depth_map(img, w, h, inverted);
+    log_performance("Depth map generation", t);
+
+    let t = performance_now();
     let pixel_data = generate_pixel_data(depth_map, w, h, DPI, gen_colors(n_colors));
+    log_performance("Pixel data generation", t);
+
+    let t = performance_now();
     reset_canvas(ctx, pixel_data, w, h);
+    log_performance("Updating canvas", t);
 }
 
 #[allow(clippy::needless_range_loop)]
@@ -205,7 +206,6 @@ pub fn generate_pixel_data(
     let mut pixel_data = vec![0_u8; width * height * 4];
 
     // color of this given pixel
-    let mut pix = vec![colors[0].clone(); width];
     // points to a pixels on the right that is constrained to be this color
     let mut same = vec![0_i32; width];
 
@@ -258,25 +258,24 @@ pub fn generate_pixel_data(
                     same[left as usize] = right;
                 }
             }
+        }
 
-            for x in (0..width).rev() {
-                if same[x] == x as i32 {
-                    pix[x] = Rc::clone(&colors.choose(rng).expect("Colud not get random color"));
-                } else {
-                    pix[x] = Rc::clone(&pix[same[x] as usize]);
-                }
+        let y_offset = y * width * 4;
+        for x in (0..width).rev() {
+            let offset = y_offset + (x * 4);
 
-                let color = &pix[x];
-                let offset = (y * width * 4) + (x * 4);
-                // log!("Set color to {:?}", color);
+            if same[x] == x as i32 {
+                let color = Rc::clone(&colors.choose(rng).expect("Colud not get random color"));
                 pixel_data[offset] = color.r;
                 pixel_data[offset + 1] = color.g;
                 pixel_data[offset + 2] = color.b;
                 pixel_data[offset + 3] = 255;
+            } else {
+                for i in 0..4 {
+                    pixel_data[offset + i] = pixel_data[y_offset + (same[x] as usize * 4) + i];
+                }
             }
         }
-        // draw_circle(width/2-far/2, height*19/20);
-        // draw_circle(width/2+far/2, height*19/20);
     }
 
     pixel_data
