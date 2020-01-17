@@ -11,7 +11,7 @@ release:
 	wasm-opt -Oz -o $(TARGET_FILE) $(TARGET_FILE).unpackaged
 	cd www && npm run build
 	rm public/* -rf
-	cp -r www/dist public
+	cp -r www/dist/* public/
 	cp -r www/CNAME public/
 	cp -r www/samples public/
 
