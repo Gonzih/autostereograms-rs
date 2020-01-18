@@ -60,10 +60,13 @@ impl Color {
 
     fn random() -> Self {
         let rng = &mut rand::thread_rng();
+        let cs = 50;
+        let ce = 180;
+
         Self::new(
-            rng.gen_range(0, 255),
-            rng.gen_range(0, 255),
-            rng.gen_range(0, 255),
+            rng.gen_range(cs, ce),
+            rng.gen_range(cs, ce),
+            rng.gen_range(cs, ce),
         )
     }
 }
@@ -178,7 +181,9 @@ pub fn render_canvas(
 ) {
     let depth_map = canvas_to_depth_map(canvas, w, h, inverted);
     let pixels_map = gen_pixels_map(w, h, gen_colors(n_colors));
-    let pixel_data = generate_pixel_data(depth_map, w, h, DPI, pixels_map);
+    let stereo = Stereogram::new(w, h, DPI, pixels_map, depth_map);
+    let pixel_data = stereo.generate_pixel_data();
+
     reset_canvas(ctx, pixel_data, w, h);
 }
 
@@ -192,105 +197,121 @@ pub fn render_img(
     n_colors: u32,
 ) {
     let depth_map = img_to_depth_map(img, w, h, inverted);
-
-    let t = performance_now();
     let pixels_map = gen_pixels_map(w, h, gen_colors(n_colors));
-    let pixel_data = generate_pixel_data(depth_map, w, h, DPI, pixels_map);
-    log_performance("Pixel data generation", t);
+    let stereo = Stereogram::new(w, h, DPI, pixels_map, depth_map);
+    let pixel_data = stereo.generate_pixel_data();
 
     reset_canvas(ctx, pixel_data, w, h);
 }
 
-#[allow(clippy::needless_range_loop)]
-/// This is implementation of algorithm from this paper:
-/// https://www2.cs.sfu.ca/CourseCentral/414/li/material/refs/SIRDS-Computer-94.pdf
-/// this also uses this library as a working reference with canvas and img tags
-/// https://github.com/peeinears/MagicEye.js
-pub fn generate_pixel_data(
-    depth_map: DepthMap,
+struct Stereogram {
     w: u32,
     h: u32,
     dpi: u32,
+    depth_map: DepthMap,
     pixels_map: PixelsMap,
-) -> Vec<u8> {
-    let e = (dpi as f32 * 2.5).round();
-    let mu = 1.0 / 3.0;
-    // let far = separation(0.0, mu, e);
-    let width = w as usize;
-    let height = h as usize;
+}
 
-    let mut pixel_data = vec![0_u8; width * height * 4];
-
-    // color of this given pixel
-    // points to a pixels on the right that is constrained to be this color
-    let mut same = vec![0_i32; width];
-
-    for y in 0..height {
-        for x in 0..width {
-            // each pixel is initially linked with itself
-            same[x] = x as i32;
-        }
-
-        for x in 0..width {
-            let z = depth_map[y][x] as f32;
-            let sep = separation(z, mu, e);
-            // x values corresponding to the left and right eyes
-            let mut left = x as i32 - (sep + (sep & y as i32 & 1)) / 2;
-            let mut right = left + sep;
-
-            // do hidden surface removal
-            if 0 <= left as i32 && right < width as i32 {
-                // we will check points x-t and x+t
-                let mut t = 1;
-                let mut visible;
-
-                loop {
-                    // z coord of ray at these two points
-                    let zt = z + 2.0 * (2.0 - mu * z) * t as f32 / (mu * e);
-                    visible = depth_map[y][x - t] < zt && depth_map[y][x + t] < zt;
-                    t += 1;
-
-                    if !visible || zt >= 1.0 {
-                        break;
-                    }
-                }
-
-                if visible {
-                    let mut k = same[left as usize];
-                    while k != left && k != right {
-                        if k < right {
-                            left = k;
-                        } else {
-                            left = right;
-                            right = k;
-                        }
-
-                        k = same[left as usize];
-                    }
-
-                    // record the same color
-                    same[left as usize] = right;
-                }
-            }
-        }
-
-        let y_offset = y * width * 4;
-        for x in (0..width).rev() {
-            let offset = y_offset + (x * 4);
-
-            if same[x] == x as i32 {
-                let color = &pixels_map[y][x];
-                pixel_data[offset] = color.r;
-                pixel_data[offset + 1] = color.g;
-                pixel_data[offset + 2] = color.b;
-                pixel_data[offset + 3] = 255;
-            } else {
-                for i in 0..4 {
-                    pixel_data[offset + i] = pixel_data[y_offset + (same[x] as usize * 4) + i];
-                }
-            }
+impl Stereogram {
+    pub fn new(w: u32, h: u32, dpi: u32, pixels_map: PixelsMap, depth_map: DepthMap) -> Self {
+        Self {
+            w,
+            h,
+            dpi,
+            pixels_map,
+            depth_map,
         }
     }
 
-    pixel_data
+    pub fn reset_depth_map(&mut self, depth_map: DepthMap) {
+        self.depth_map = depth_map;
+    }
+
+    #[allow(clippy::needless_range_loop)]
+    /// This is implementation of algorithm from this paper:
+    /// https://www2.cs.sfu.ca/CourseCentral/414/li/material/refs/SIRDS-Computer-94.pdf
+    /// this also uses this library as a working reference with canvas and img tags
+    /// https://github.com/peeinears/MagicEye.js
+    pub fn generate_pixel_data(&self) -> Vec<u8> {
+        let e = (self.dpi as f32 * 2.5).round();
+        let mu = 1.0 / 3.0;
+        // let far = separation(0.0, mu, e);
+        let width = self.w as usize;
+        let height = self.h as usize;
+
+        let mut pixel_data = vec![0_u8; width * height * 4];
+
+        // color of this given pixel
+        // points to a pixels on the right that is constrained to be this color
+        let mut same = vec![0_i32; width];
+
+        for y in 0..height {
+            for x in 0..width {
+                // each pixel is initially linked with itself
+                same[x] = x as i32;
+            }
+
+            for x in 0..width {
+                let z = self.depth_map[y][x] as f32;
+                let sep = separation(z, mu, e);
+                // x values corresponding to the left and right eyes
+                let mut left = x as i32 - (sep + (sep & y as i32 & 1)) / 2;
+                let mut right = left + sep;
+
+                // do hidden surface removal
+                if 0 <= left as i32 && right < width as i32 {
+                    // we will check points x-t and x+t
+                    let mut t = 1;
+                    let mut visible;
+
+                    loop {
+                        // z coord of ray at these two points
+                        let zt = z + 2.0 * (2.0 - mu * z) * t as f32 / (mu * e);
+                        visible = self.depth_map[y][x - t] < zt && self.depth_map[y][x + t] < zt;
+                        t += 1;
+
+                        if !visible || zt >= 1.0 {
+                            break;
+                        }
+                    }
+
+                    if visible {
+                        let mut k = same[left as usize];
+                        while k != left && k != right {
+                            if k < right {
+                                left = k;
+                            } else {
+                                left = right;
+                                right = k;
+                            }
+
+                            k = same[left as usize];
+                        }
+
+                        // record the same color
+                        same[left as usize] = right;
+                    }
+                }
+            }
+
+            let y_offset = y * width * 4;
+            for x in (0..width).rev() {
+                let offset = y_offset + (x * 4);
+
+                if same[x] == x as i32 {
+                    let color = &self.pixels_map[y][x];
+                    pixel_data[offset] = color.r;
+                    pixel_data[offset + 1] = color.g;
+                    pixel_data[offset + 2] = color.b;
+                    pixel_data[offset + 3] = 255;
+                } else {
+                    for i in 0..4 {
+                        pixel_data[offset + i] = pixel_data[y_offset + (same[x] as usize * 4) + i];
+                    }
+                }
+            }
+        }
+
+        pixel_data
+    }
 }
