@@ -225,10 +225,6 @@ impl Stereogram {
         }
     }
 
-    pub fn reset_depth_map(&mut self, depth_map: DepthMap) {
-        self.depth_map = depth_map;
-    }
-
     #[allow(clippy::needless_range_loop)]
     /// This is implementation of algorithm from this paper:
     /// https://www2.cs.sfu.ca/CourseCentral/414/li/material/refs/SIRDS-Computer-94.pdf
