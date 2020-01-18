@@ -73,6 +73,8 @@ fn separation(z: f32, mu: f32, e: f32) -> i32 {
 }
 
 type DepthMap = Vec<Vec<f32>>;
+type PixelsMap = Vec<Vec<Rc<Color>>>;
+type Colors = Vec<Rc<Color>>;
 
 #[allow(clippy::needless_range_loop)]
 fn ctx_to_depth_map(ctx: &CanvasRenderingContext2d, w: u32, h: u32, inverted: bool) -> DepthMap {
@@ -140,13 +142,29 @@ fn reset_canvas(ctx: &CanvasRenderingContext2d, mut pixel_data: Vec<u8>, w: u32,
     log!("Finished rendering!");
 }
 
-fn gen_colors(n: u32) -> Vec<Rc<Color>> {
+fn gen_colors(n: u32) -> Colors {
     let mut colors = vec![];
     for _ in 0..n {
         colors.push(Rc::new(Color::random()));
     }
 
     colors
+}
+
+fn gen_pixels_map(w: u32, h: u32, colors: Colors) -> PixelsMap {
+    let width = w as usize;
+    let height = h as usize;
+
+    let mut pix = vec![vec![colors[0].clone(); width]; height];
+    let rng = &mut rand::thread_rng();
+
+    for col in &mut pix {
+        for px in col {
+            *px = Rc::clone(&colors.choose(rng).expect("Colud not get random color"));
+        }
+    }
+
+    pix
 }
 
 #[wasm_bindgen]
@@ -159,7 +177,8 @@ pub fn render_canvas(
     n_colors: u32,
 ) {
     let depth_map = canvas_to_depth_map(canvas, w, h, inverted);
-    let pixel_data = generate_pixel_data(depth_map, w, h, DPI, gen_colors(n_colors));
+    let pixels_map = gen_pixels_map(w, h, gen_colors(n_colors));
+    let pixel_data = generate_pixel_data(depth_map, w, h, DPI, pixels_map);
     reset_canvas(ctx, pixel_data, w, h);
 }
 
@@ -175,7 +194,8 @@ pub fn render_img(
     let depth_map = img_to_depth_map(img, w, h, inverted);
 
     let t = performance_now();
-    let pixel_data = generate_pixel_data(depth_map, w, h, DPI, gen_colors(n_colors));
+    let pixels_map = gen_pixels_map(w, h, gen_colors(n_colors));
+    let pixel_data = generate_pixel_data(depth_map, w, h, DPI, pixels_map);
     log_performance("Pixel data generation", t);
 
     reset_canvas(ctx, pixel_data, w, h);
@@ -191,7 +211,7 @@ pub fn generate_pixel_data(
     w: u32,
     h: u32,
     dpi: u32,
-    colors: Vec<Rc<Color>>,
+    pixels_map: PixelsMap,
 ) -> Vec<u8> {
     let e = (dpi as f32 * 2.5).round();
     let mu = 1.0 / 3.0;
@@ -204,8 +224,6 @@ pub fn generate_pixel_data(
     // color of this given pixel
     // points to a pixels on the right that is constrained to be this color
     let mut same = vec![0_i32; width];
-
-    let rng = &mut rand::thread_rng();
 
     for y in 0..height {
         for x in 0..width {
@@ -261,7 +279,7 @@ pub fn generate_pixel_data(
             let offset = y_offset + (x * 4);
 
             if same[x] == x as i32 {
-                let color = Rc::clone(&colors.choose(rng).expect("Colud not get random color"));
+                let color = &pixels_map[y][x];
                 pixel_data[offset] = color.r;
                 pixel_data[offset + 1] = color.g;
                 pixel_data[offset + 2] = color.b;
