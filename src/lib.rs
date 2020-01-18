@@ -2,7 +2,6 @@ mod utils;
 
 use rand::seq::SliceRandom;
 use rand::Rng;
-use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::Clamped;
 use wasm_bindgen::JsCast;
@@ -76,8 +75,8 @@ fn separation(z: f32, mu: f32, e: f32) -> i32 {
 }
 
 type DepthMap = Vec<Vec<f32>>;
-type PixelsMap = Vec<Vec<Rc<Color>>>;
-type Colors = Vec<Rc<Color>>;
+type PixelsMap = Vec<Vec<Color>>;
+type Colors = Vec<Color>;
 
 #[allow(clippy::needless_range_loop)]
 fn ctx_to_depth_map(ctx: &CanvasRenderingContext2d, w: u32, h: u32, inverted: bool) -> DepthMap {
@@ -148,7 +147,7 @@ fn reset_canvas(ctx: &CanvasRenderingContext2d, mut pixel_data: Vec<u8>, w: u32,
 fn gen_colors(n: u32) -> Colors {
     let mut colors = vec![];
     for _ in 0..n {
-        colors.push(Rc::new(Color::random()));
+        colors.push(Color::random());
     }
 
     colors
@@ -163,7 +162,10 @@ fn gen_pixels_map(w: u32, h: u32, colors: Colors) -> PixelsMap {
 
     for col in &mut pix {
         for px in col {
-            *px = Rc::clone(&colors.choose(rng).expect("Colud not get random color"));
+            *px = colors
+                .choose(rng)
+                .expect("Colud not get random color")
+                .clone();
         }
     }
 
