@@ -106,17 +106,11 @@
 /******/ 					"__widl_f_data_ImageData": function(p0i32,p1i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_data_ImageData"](p0i32,p1i32);
 /******/ 					},
-/******/ 					"__widl_f_now_Performance": function(p0i32) {
-/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_now_Performance"](p0i32);
-/******/ 					},
 /******/ 					"__widl_instanceof_Window": function(p0i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_instanceof_Window"](p0i32);
 /******/ 					},
 /******/ 					"__widl_f_document_Window": function(p0i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_document_Window"](p0i32);
-/******/ 					},
-/******/ 					"__widl_f_performance_Window": function(p0i32) {
-/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_performance_Window"](p0i32);
 /******/ 					},
 /******/ 					"__wbg_newnoargs_c4b2cbbd30e2d057": function(p0i32,p1i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbg_newnoargs_c4b2cbbd30e2d057"](p0i32,p1i32);
@@ -267,7 +261,7 @@
 /******/ 				promises.push(installedWasmModuleData);
 /******/ 			else {
 /******/ 				var importObject = wasmImportObjects[wasmModuleId]();
-/******/ 				var req = fetch(__webpack_require__.p + "" + {"../pkg/autostereograms_rs_bg.wasm":"3967749958273729e0fb"}[wasmModuleId] + ".module.wasm");
+/******/ 				var req = fetch(__webpack_require__.p + "" + {"../pkg/autostereograms_rs_bg.wasm":"ed0e96c92976613d635e"}[wasmModuleId] + ".module.wasm");
 /******/ 				var promise;
 /******/ 				if(importObject instanceof Promise && typeof WebAssembly.compileStreaming === 'function') {
 /******/ 					promise = Promise.all([WebAssembly.compileStreaming(req), importObject]).then(function(items) {
