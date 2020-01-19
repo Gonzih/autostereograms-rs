@@ -70,9 +70,6 @@
 /******/ 					"__wbg_error_4bb6c2a97407129a": function(p0i32,p1i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbg_error_4bb6c2a97407129a"](p0i32,p1i32);
 /******/ 					},
-/******/ 					"__widl_f_log_1_": function(p0i32) {
-/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_log_1_"](p0i32);
-/******/ 					},
 /******/ 					"__widl_instanceof_CanvasRenderingContext2D": function(p0i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_instanceof_CanvasRenderingContext2D"](p0i32);
 /******/ 					},
@@ -112,6 +109,9 @@
 /******/ 					"__widl_f_document_Window": function(p0i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_document_Window"](p0i32);
 /******/ 					},
+/******/ 					"__widl_f_log_1_": function(p0i32) {
+/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_log_1_"](p0i32);
+/******/ 					},
 /******/ 					"__wbg_newnoargs_c4b2cbbd30e2d057": function(p0i32,p1i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbg_newnoargs_c4b2cbbd30e2d057"](p0i32,p1i32);
 /******/ 					},
@@ -135,24 +135,6 @@
 /******/ 					},
 /******/ 					"__wbindgen_object_clone_ref": function(p0i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbindgen_object_clone_ref"](p0i32);
-/******/ 					},
-/******/ 					"__wbg_self_1b7a39e3a92c949c": function() {
-/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbg_self_1b7a39e3a92c949c"]();
-/******/ 					},
-/******/ 					"__wbg_require_604837428532a733": function(p0i32,p1i32) {
-/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbg_require_604837428532a733"](p0i32,p1i32);
-/******/ 					},
-/******/ 					"__wbg_crypto_968f1772287e2df0": function(p0i32) {
-/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbg_crypto_968f1772287e2df0"](p0i32);
-/******/ 					},
-/******/ 					"__wbg_getRandomValues_a3d34b4fee3c2869": function(p0i32) {
-/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbg_getRandomValues_a3d34b4fee3c2869"](p0i32);
-/******/ 					},
-/******/ 					"__wbg_getRandomValues_f5e14ab7ac8e995d": function(p0i32,p1i32,p2i32) {
-/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbg_getRandomValues_f5e14ab7ac8e995d"](p0i32,p1i32,p2i32);
-/******/ 					},
-/******/ 					"__wbg_randomFillSync_d5bd2d655fdf256a": function(p0i32,p1i32,p2i32) {
-/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbg_randomFillSync_d5bd2d655fdf256a"](p0i32,p1i32,p2i32);
 /******/ 					},
 /******/ 					"__wbindgen_debug_string": function(p0i32,p1i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbindgen_debug_string"](p0i32,p1i32);
@@ -261,7 +243,7 @@
 /******/ 				promises.push(installedWasmModuleData);
 /******/ 			else {
 /******/ 				var importObject = wasmImportObjects[wasmModuleId]();
-/******/ 				var req = fetch(__webpack_require__.p + "" + {"../pkg/autostereograms_rs_bg.wasm":"19a3dbce74de90a91c26"}[wasmModuleId] + ".module.wasm");
+/******/ 				var req = fetch(__webpack_require__.p + "" + {"../pkg/autostereograms_rs_bg.wasm":"24c2d64a401c4a1dd477"}[wasmModuleId] + ".module.wasm");
 /******/ 				var promise;
 /******/ 				if(importObject instanceof Promise && typeof WebAssembly.compileStreaming === 'function') {
 /******/ 					promise = Promise.all([WebAssembly.compileStreaming(req), importObject]).then(function(items) {
