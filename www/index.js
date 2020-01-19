@@ -6,8 +6,6 @@ let canvas = document.getElementById("autostereogram_one");
 let ctx = canvas.getContext("2d");
 let img = document.getElementById("source-image");
 
-wasm.debug();
-
 canvas.width = img.width;
 canvas.height = img.height;
 
