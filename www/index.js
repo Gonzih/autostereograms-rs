@@ -17,6 +17,6 @@ let h = canvas.height;
 console.log("Canvas height is", h, "width is", w);
 
 let t0 = performance.now();
-wasm.render_img(img, ctx, canvas.width, canvas.height, false, 3);
+wasm.render_img(img, ctx, canvas.width, canvas.height, false, 3, "hellloworld");
 let t1 = performance.now();
 console.log("Rendering took " + (t1 - t0) + " milliseconds.");

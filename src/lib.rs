@@ -1,7 +1,8 @@
 mod utils;
 
+use rand::rngs::SmallRng;
 use rand::seq::SliceRandom;
-use rand::Rng;
+use rand::{Rng, RngCore, SeedableRng};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::Clamped;
 use wasm_bindgen::JsCast;
@@ -57,8 +58,7 @@ impl Color {
         Color { r, g, b }
     }
 
-    fn random() -> Self {
-        let rng = &mut rand::thread_rng();
+    fn random(rng: &mut SmallRng) -> Self {
         let cs = 50;
         let ce = 180;
 
@@ -144,26 +144,38 @@ fn reset_canvas(ctx: &CanvasRenderingContext2d, mut pixel_data: Vec<u8>, w: u32,
     log!("Finished rendering!");
 }
 
-fn gen_colors(n: u32) -> Colors {
+fn gen_colors(n: u32, rng: &mut SmallRng) -> Colors {
     let mut colors = vec![];
     for _ in 0..n {
-        colors.push(Color::random());
+        colors.push(Color::random(rng));
     }
 
     colors
 }
 
-fn gen_pixels_map(w: u32, h: u32, colors: Colors) -> PixelsMap {
+fn gen_pixels_map(w: u32, h: u32, n_colors: u32, seed: String) -> PixelsMap {
+    let original_seed = seed.clone();
+    let mut seed_str = seed.clone();
+    while seed_str.len() < 16 {
+        seed_str.push_str(&original_seed);
+    }
+
+    log!("Using \"{}\" as a seed", seed_str[0..16].to_string());
+
+    let mut seed = [0; 16];
+    seed.copy_from_slice(seed_str[0..16].as_bytes());
+
+    let mut rng = SmallRng::from_seed(seed);
+    let colors = gen_colors(n_colors, &mut rng);
     let width = w as usize;
     let height = h as usize;
 
     let mut pix = vec![vec![colors[0].clone(); width]; height];
-    let rng = &mut rand::thread_rng();
 
     for col in &mut pix {
         for px in col {
             *px = colors
-                .choose(rng)
+                .choose(&mut rng)
                 .expect("Colud not get random color")
                 .clone();
         }
@@ -180,9 +192,10 @@ pub fn render_canvas(
     h: u32,
     inverted: bool,
     n_colors: u32,
+    seed: String,
 ) {
     let depth_map = canvas_to_depth_map(canvas, w, h, inverted);
-    let pixels_map = gen_pixels_map(w, h, gen_colors(n_colors));
+    let pixels_map = gen_pixels_map(w, h, n_colors, seed);
     let stereo = Stereogram::new(w, h, DPI, pixels_map, depth_map);
     let pixel_data = stereo.generate_pixel_data();
 
@@ -197,9 +210,10 @@ pub fn render_img(
     h: u32,
     inverted: bool,
     n_colors: u32,
+    seed: String,
 ) {
     let depth_map = img_to_depth_map(img, w, h, inverted);
-    let pixels_map = gen_pixels_map(w, h, gen_colors(n_colors));
+    let pixels_map = gen_pixels_map(w, h, n_colors, seed);
     let stereo = Stereogram::new(w, h, DPI, pixels_map, depth_map);
     let pixel_data = stereo.generate_pixel_data();
 
