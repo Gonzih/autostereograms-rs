@@ -218,6 +218,7 @@ pub fn render_img(
     n_colors: u32,
     seed: String,
 ) {
+    let t = performance_now();
     let depth_map = img_to_depth_map(img, w, h, margin, inverted);
 
     let w = w + margin * 2;
@@ -227,6 +228,8 @@ pub fn render_img(
     let pixel_data = stereo.generate_pixel_data();
 
     reset_canvas(ctx, pixel_data, w, h);
+
+    log_performance("Img rendering", t);
 }
 
 struct Stereogram {

@@ -2,12 +2,34 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Hello wasm-pack!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Autostereograms!</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css"></link>
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
   </head>
   <body>
-    <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
-    <img id="source-image" src="/samples/cup.jpg">
-    <canvas id="autostereogram_one"></canvas>
-    <script src="./bootstrap.js"></script>
+      <section class="section">
+          <div class="container">
+              <button class="button" id="demo-one-show-origin">Show original image</button class="button">
+              <button class="button" id="demo-one-show-canvas">Show stereogram</button class="button">
+
+              <div id="demo-one-img-wrapper">
+                  <img id="source-image-one" src="/samples/cup.jpg">
+              </div>
+
+              <div id="demo-one-target-wrapper">
+                  <canvas id="autostereogram-one"></canvas>
+              </div>
+
+              <button class="button" id="demo-one-cup">Cup</button class="button">
+              <button class="button" id="demo-one-sphere">Sphere</button class="button">
+              <button class="button" id="demo-one-shapes">Shapes</button class="button">
+              <button class="button" id="demo-one-trike">Trike</button class="button">
+              <button class="button" id="demo-one-shark">Shark</button class="button">
+          </div>
+      </section>
+
+      <script src="./bootstrap.js"></script>
   </body>
 </html>
