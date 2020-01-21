@@ -103,11 +103,17 @@
 /******/ 					"__widl_f_data_ImageData": function(p0i32,p1i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_data_ImageData"](p0i32,p1i32);
 /******/ 					},
+/******/ 					"__widl_f_now_Performance": function(p0i32) {
+/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_now_Performance"](p0i32);
+/******/ 					},
 /******/ 					"__widl_instanceof_Window": function(p0i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_instanceof_Window"](p0i32);
 /******/ 					},
 /******/ 					"__widl_f_document_Window": function(p0i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_document_Window"](p0i32);
+/******/ 					},
+/******/ 					"__widl_f_performance_Window": function(p0i32) {
+/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_performance_Window"](p0i32);
 /******/ 					},
 /******/ 					"__widl_f_log_1_": function(p0i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_log_1_"](p0i32);
@@ -243,7 +249,7 @@
 /******/ 				promises.push(installedWasmModuleData);
 /******/ 			else {
 /******/ 				var importObject = wasmImportObjects[wasmModuleId]();
-/******/ 				var req = fetch(__webpack_require__.p + "" + {"../pkg/autostereograms_rs_bg.wasm":"d06e62b41d7264a159cb"}[wasmModuleId] + ".module.wasm");
+/******/ 				var req = fetch(__webpack_require__.p + "" + {"../pkg/autostereograms_rs_bg.wasm":"1bb7bcf919d74a5a3f0d"}[wasmModuleId] + ".module.wasm");
 /******/ 				var promise;
 /******/ 				if(importObject instanceof Promise && typeof WebAssembly.compileStreaming === 'function') {
 /******/ 					promise = Promise.all([WebAssembly.compileStreaming(req), importObject]).then(function(items) {
