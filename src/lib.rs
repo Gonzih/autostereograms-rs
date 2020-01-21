@@ -110,7 +110,13 @@ pub fn canvas_to_depth_map(canvas: &HtmlCanvasElement, w: u32, h: u32, inverted:
     ctx_to_depth_map(&ctx, w, h, inverted)
 }
 
-pub fn img_to_depth_map(img: &HtmlImageElement, w: u32, h: u32, inverted: bool) -> DepthMap {
+pub fn img_to_depth_map(
+    img: &HtmlImageElement,
+    w: u32,
+    h: u32,
+    margin: u32,
+    inverted: bool,
+) -> DepthMap {
     let document = web_sys::window().unwrap().document().unwrap();
     let canvas = document
         .create_element("canvas")
@@ -118,6 +124,8 @@ pub fn img_to_depth_map(img: &HtmlImageElement, w: u32, h: u32, inverted: bool) 
         .dyn_into::<web_sys::HtmlCanvasElement>()
         .unwrap();
 
+    let w = w + margin * 2;
+    let h = h + margin * 2;
     canvas.set_width(w);
     canvas.set_height(h);
 
@@ -128,7 +136,7 @@ pub fn img_to_depth_map(img: &HtmlImageElement, w: u32, h: u32, inverted: bool) 
         .dyn_into::<web_sys::CanvasRenderingContext2d>()
         .unwrap();
 
-    ctx.draw_image_with_html_image_element(img, 0.0, 0.0)
+    ctx.draw_image_with_html_image_element(img, margin as f64, margin as f64)
         .unwrap();
 
     ctx_to_depth_map(&ctx, w, h, inverted)
@@ -208,11 +216,15 @@ pub fn render_img(
     ctx: &CanvasRenderingContext2d,
     w: u32,
     h: u32,
+    margin: u32,
     inverted: bool,
     n_colors: u32,
     seed: String,
 ) {
-    let depth_map = img_to_depth_map(img, w, h, inverted);
+    let depth_map = img_to_depth_map(img, w, h, margin, inverted);
+
+    let w = w + margin * 2;
+    let h = h + margin * 2;
     let pixels_map = gen_pixels_map(w, h, n_colors, seed);
     let stereo = Stereogram::new(w, h, DPI, pixels_map, depth_map);
     let pixel_data = stereo.generate_pixel_data();
