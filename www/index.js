@@ -7,7 +7,7 @@ let ctx = canvas.getContext("2d");
 let img = document.getElementById("source-image");
 
 let margin = 200;
-let seed = "myseedstringisthisglong"
+let seed = "33333333333333333333333"
 
 canvas.width = img.width + margin * 2;
 canvas.height = img.height + margin * 2;
