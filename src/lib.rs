@@ -59,13 +59,10 @@ impl Color {
     }
 
     fn random(rng: &mut SmallRng) -> Self {
-        let cs = 0;
-        let ce = 255;
-
         Self::new(
-            rng.gen_range(cs, ce),
-            rng.gen_range(cs, ce),
-            rng.gen_range(cs, ce),
+            rng.gen(),
+            rng.gen(),
+            rng.gen(),
         )
     }
 }
