@@ -190,8 +190,8 @@ fn gen_pixels_map(w: u32, h: u32, n_colors: u32, seed: String) -> PixelsMap {
 }
 
 #[wasm_bindgen]
-pub fn render_canvas(
-    canvas: &HtmlCanvasElement,
+pub fn render_ctx(
+    source_ctx: &CanvasRenderingContext2d,
     ctx: &CanvasRenderingContext2d,
     w: u32,
     h: u32,
@@ -200,8 +200,8 @@ pub fn render_canvas(
     seed: String,
 ) {
     let t = performance_now();
-    let depth_map = canvas_to_depth_map(canvas, w, h, inverted);
     let pixels_map = gen_pixels_map(w, h, n_colors, seed);
+    let depth_map = ctx_to_depth_map(source_ctx, w, h, inverted);
     let stereo = Stereogram::new(w, h, DPI, pixels_map, depth_map);
     let pixel_data = stereo.generate_pixel_data();
 
@@ -209,30 +209,30 @@ pub fn render_canvas(
     log_performance("Canvas rendering", t);
 }
 
-#[wasm_bindgen]
-pub fn render_img(
-    img: &HtmlImageElement,
-    ctx: &CanvasRenderingContext2d,
-    w: u32,
-    h: u32,
-    margin: u32,
-    inverted: bool,
-    n_colors: u32,
-    seed: String,
-) {
-    let t = performance_now();
-    let depth_map = img_to_depth_map(img, w, h, margin, inverted);
+// #[wasm_bindgen]
+// pub fn render_img(
+//     img: &HtmlImageElement,
+//     ctx: &CanvasRenderingContext2d,
+//     w: u32,
+//     h: u32,
+//     margin: u32,
+//     inverted: bool,
+//     n_colors: u32,
+//     seed: String,
+// ) {
+//     let t = performance_now();
+//     let depth_map = img_to_depth_map(img, w, h, margin, inverted);
 
-    let w = w + margin * 2;
-    let h = h + margin * 2;
-    let pixels_map = gen_pixels_map(w, h, n_colors, seed);
-    let stereo = Stereogram::new(w, h, DPI, pixels_map, depth_map);
-    let pixel_data = stereo.generate_pixel_data();
+//     let w = w + margin * 2;
+//     let h = h + margin * 2;
+//     let pixels_map = gen_pixels_map(w, h, n_colors, seed);
+//     let stereo = Stereogram::new(w, h, DPI, pixels_map, depth_map);
+//     let pixel_data = stereo.generate_pixel_data();
 
-    reset_canvas(ctx, pixel_data, w, h);
+//     reset_canvas(ctx, pixel_data, w, h);
 
-    log_performance("Img rendering", t);
-}
+//     log_performance("Img rendering", t);
+// }
 
 struct Stereogram {
     w: u32,
