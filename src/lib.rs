@@ -96,7 +96,7 @@ fn ctx_to_depth_map(ctx: &CanvasRenderingContext2d, w: u32, h: u32, inverted: bo
     result
 }
 
-pub fn canvas_to_depth_map(canvas: &HtmlCanvasElement, w: u32, h: u32, inverted: bool) -> DepthMap {
+fn canvas_to_depth_map(canvas: &HtmlCanvasElement, w: u32, h: u32, inverted: bool) -> DepthMap {
     let ctx = canvas
         .get_context("2d")
         .unwrap()
@@ -107,7 +107,7 @@ pub fn canvas_to_depth_map(canvas: &HtmlCanvasElement, w: u32, h: u32, inverted:
     ctx_to_depth_map(&ctx, w, h, inverted)
 }
 
-pub fn img_to_depth_map(
+fn img_to_depth_map(
     img: &HtmlImageElement,
     w: u32,
     h: u32,
