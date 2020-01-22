@@ -11,22 +11,27 @@
   <body>
       <section class="section">
           <div class="container">
-              <button class="button" id="demo-one-show-origin">Show original image</button class="button">
-              <button class="button" id="demo-one-show-canvas">Show stereogram</button class="button">
-
-              <div id="demo-one-img-wrapper">
-                  <img id="source-image-one" src="/samples/cup.jpg">
+              <div class="content">
+                  <button class="button" id="demo-one-show-origin">Show original image</button>
+                  <button class="button" id="demo-one-show-canvas">Show stereogram</button>
               </div>
 
-              <div id="demo-one-target-wrapper">
-                  <canvas id="autostereogram-one"></canvas>
+              <div class="content">
+                  <div id="demo-one-img-wrapper">
+                      <canvas id="source-one" width=600 height=400></canvas>
+                  </div>
+
+                  <div id="demo-one-target-wrapper">
+                      <canvas id="autostereogram-one"></canvas>
+                  </div>
               </div>
 
-              <button class="button" id="demo-one-cup">Cup</button class="button">
-              <button class="button" id="demo-one-sphere">Sphere</button class="button">
-              <button class="button" id="demo-one-shapes">Shapes</button class="button">
-              <button class="button" id="demo-one-trike">Trike</button class="button">
-              <button class="button" id="demo-one-shark">Shark</button class="button">
+
+              <div class="content">
+                  <button class="button" id="demo-one-circle">Circle</button>
+                  <button class="button" id="demo-one-square">Square</button>
+                  <button class="button" id="demo-one-triangle">Triangle</button>
+              </div>
           </div>
       </section>
 

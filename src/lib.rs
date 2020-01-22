@@ -199,12 +199,14 @@ pub fn render_canvas(
     n_colors: u32,
     seed: String,
 ) {
+    let t = performance_now();
     let depth_map = canvas_to_depth_map(canvas, w, h, inverted);
     let pixels_map = gen_pixels_map(w, h, n_colors, seed);
     let stereo = Stereogram::new(w, h, DPI, pixels_map, depth_map);
     let pixel_data = stereo.generate_pixel_data();
 
     reset_canvas(ctx, pixel_data, w, h);
+    log_performance("Canvas rendering", t);
 }
 
 #[wasm_bindgen]

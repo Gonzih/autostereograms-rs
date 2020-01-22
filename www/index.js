@@ -2,60 +2,69 @@ import * as wasm from "autostereograms-rs";
 
 wasm.debug();
 
-function demo_one_render(img) {
+function demo_one_render() {
+    let source_canvas = document.getElementById("source-one");
     let canvas = document.getElementById("autostereogram-one");
     let ctx = canvas.getContext("2d");
 
-    let margin = 20;
     let seed = "33333333333333333333333"
 
-    canvas.width = img.width + margin * 2;
-    canvas.height = img.height + margin * 2;
+    let margin = 0;
+    canvas.width = source_canvas.width + margin * 2;
+    canvas.height = source_canvas.height + margin * 2;
 
     let w = canvas.width;
     let h = canvas.height;
 
     console.log("Canvas height is", h, "width is", w);
 
-    wasm.render_img(img, ctx, w, h, margin, false, 3, seed);
+    wasm.render_canvas(source_canvas, ctx, w, h, false, 3, seed);
 }
 
 function init_demo_one() {
-    let img = document.getElementById("source-image-one");
-    demo_one_render(img);
+    render_circle();
 }
 
-function set_source(src) {
-    let img = document.getElementById("source-image-one");
-    img.onload = function() {
-        demo_one_render(img);
-    }
-    img.src = "/samples/" + src;
+function render_circle() {
+    let canvas = document.getElementById("source-one");
+    let ctx = canvas.getContext("2d");
+
+    ctx.beginPath();
+    ctx.arc(canvas.width/2, canvas.height/2, 52, 0, 2 * Math.PI, false);
+    ctx.fillStyle = 'black';
+    ctx.fill();
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = '#000';
+    ctx.stroke();
+
+    demo_one_render();
+}
+
+function getID(id) {
+    return document.getElementById(id)
 }
 
 init_demo_one();
-document.getElementById("demo-one-cup").onclick = function() { set_source("cup.jpg"); };
-document.getElementById("demo-one-sphere").onclick = function() { set_source("sphere.jpg"); };
-document.getElementById("demo-one-shapes").onclick = function() { set_source("shapes1.png"); };
-document.getElementById("demo-one-trike").onclick = function() { set_source("trike.jpg"); };
-document.getElementById("demo-one-shark").onclick = function() { set_source("shark.png"); };
+getID("demo-one-circle").onclick = render_circle;
+getID("demo-one-square").onclick = render_circle;
+getID("demo-one-triangle").onclick = render_circle;
 
 function showorigin() {
-    document.getElementById("demo-one-img-wrapper").style.display = "block";
-    document.getElementById("demo-one-target-wrapper").style.display = "none";
+    getID("demo-one-img-wrapper").style.display = "block";
+    getID("demo-one-target-wrapper").style.display = "none";
 
-    document.getElementById("demo-one-show-origin").style.display = "none";
-    document.getElementById("demo-one-show-canvas").style.display = "inline";
+    getID("demo-one-show-origin").style.display = "none";
+    getID("demo-one-show-canvas").style.display = "inline";
 }
 
 function showcanvas() {
-    document.getElementById("demo-one-img-wrapper").style.display = "none";
-    document.getElementById("demo-one-target-wrapper").style.display = "block";
+    getID("demo-one-img-wrapper").style.display = "none";
+    getID("demo-one-target-wrapper").style.display = "block";
 
-    document.getElementById("demo-one-show-origin").style.display = "inline";
-    document.getElementById("demo-one-show-canvas").style.display = "none";
+    getID("demo-one-show-origin").style.display = "inline";
+    getID("demo-one-show-canvas").style.display = "none";
 }
 
-document.getElementById("demo-one-show-origin").onclick = showorigin;
-document.getElementById("demo-one-show-canvas").onclick = showcanvas;
+getID("demo-one-show-origin").onclick = showorigin;
+getID("demo-one-show-canvas").onclick = showcanvas;
 showcanvas();
