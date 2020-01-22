@@ -73,32 +73,11 @@
 /******/ 					"__widl_f_log_1_": function(p0i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_log_1_"](p0i32);
 /******/ 					},
-/******/ 					"__widl_instanceof_CanvasRenderingContext2D": function(p0i32) {
-/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_instanceof_CanvasRenderingContext2D"](p0i32);
-/******/ 					},
-/******/ 					"__widl_f_draw_image_with_html_image_element_CanvasRenderingContext2D": function(p0i32,p1i32,p2f64,p3f64) {
-/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_draw_image_with_html_image_element_CanvasRenderingContext2D"](p0i32,p1i32,p2f64,p3f64);
-/******/ 					},
 /******/ 					"__widl_f_get_image_data_CanvasRenderingContext2D": function(p0i32,p1f64,p2f64,p3f64,p4f64) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_get_image_data_CanvasRenderingContext2D"](p0i32,p1f64,p2f64,p3f64,p4f64);
 /******/ 					},
 /******/ 					"__widl_f_put_image_data_CanvasRenderingContext2D": function(p0i32,p1i32,p2f64,p3f64) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_put_image_data_CanvasRenderingContext2D"](p0i32,p1i32,p2f64,p3f64);
-/******/ 					},
-/******/ 					"__widl_f_create_element_Document": function(p0i32,p1i32,p2i32) {
-/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_create_element_Document"](p0i32,p1i32,p2i32);
-/******/ 					},
-/******/ 					"__widl_instanceof_HTMLCanvasElement": function(p0i32) {
-/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_instanceof_HTMLCanvasElement"](p0i32);
-/******/ 					},
-/******/ 					"__widl_f_get_context_HTMLCanvasElement": function(p0i32,p1i32,p2i32) {
-/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_get_context_HTMLCanvasElement"](p0i32,p1i32,p2i32);
-/******/ 					},
-/******/ 					"__widl_f_set_width_HTMLCanvasElement": function(p0i32,p1i32) {
-/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_set_width_HTMLCanvasElement"](p0i32,p1i32);
-/******/ 					},
-/******/ 					"__widl_f_set_height_HTMLCanvasElement": function(p0i32,p1i32) {
-/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_set_height_HTMLCanvasElement"](p0i32,p1i32);
 /******/ 					},
 /******/ 					"__widl_f_new_with_u8_clamped_array_and_sh_ImageData": function(p0i32,p1i32,p2i32,p3i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_new_with_u8_clamped_array_and_sh_ImageData"](p0i32,p1i32,p2i32,p3i32);
@@ -111,9 +90,6 @@
 /******/ 					},
 /******/ 					"__widl_instanceof_Window": function(p0i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_instanceof_Window"](p0i32);
-/******/ 					},
-/******/ 					"__widl_f_document_Window": function(p0i32) {
-/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_document_Window"](p0i32);
 /******/ 					},
 /******/ 					"__widl_f_performance_Window": function(p0i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_performance_Window"](p0i32);
@@ -249,7 +225,7 @@
 /******/ 				promises.push(installedWasmModuleData);
 /******/ 			else {
 /******/ 				var importObject = wasmImportObjects[wasmModuleId]();
-/******/ 				var req = fetch(__webpack_require__.p + "" + {"../pkg/autostereograms_rs_bg.wasm":"a4a270e4596da14adcb7"}[wasmModuleId] + ".module.wasm");
+/******/ 				var req = fetch(__webpack_require__.p + "" + {"../pkg/autostereograms_rs_bg.wasm":"a27dea7624ce3079fbaa"}[wasmModuleId] + ".module.wasm");
 /******/ 				var promise;
 /******/ 				if(importObject instanceof Promise && typeof WebAssembly.compileStreaming === 'function') {
 /******/ 					promise = Promise.all([WebAssembly.compileStreaming(req), importObject]).then(function(items) {
