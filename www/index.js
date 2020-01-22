@@ -2,9 +2,13 @@ import * as wasm from "autostereograms-rs";
 
 wasm.debug();
 
+function getID(id) {
+    return document.getElementById(id)
+}
+
 function demo_one_render() {
-    let source_canvas = document.getElementById("source-one");
-    let canvas = document.getElementById("autostereogram-one");
+    let source_canvas = getID("source-one");
+    let canvas = getID("autostereogram-one");
     let ctx = canvas.getContext("2d");
 
     let seed = "33333333333333333333333"
@@ -26,7 +30,7 @@ function init_demo_one() {
 }
 
 function render_circle() {
-    let canvas = document.getElementById("source-one");
+    let canvas = getID("source-one");
     let ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -42,7 +46,7 @@ function render_circle() {
 }
 
 function render_square() {
-    let canvas = document.getElementById("source-one");
+    let canvas = getID("source-one");
     let ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -58,7 +62,7 @@ function render_square() {
 }
 
 function render_triangle() {
-    let canvas = document.getElementById("source-one");
+    let canvas = getID("source-one");
     let ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -75,10 +79,6 @@ function render_triangle() {
     ctx.stroke();
 
     demo_one_render();
-}
-
-function getID(id) {
-    return document.getElementById(id)
 }
 
 init_demo_one();
