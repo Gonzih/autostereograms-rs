@@ -2,6 +2,9 @@ import * as wasm from "autostereograms-rs";
 
 wasm.debug();
 
+let light_color = "#cdcdcd"
+let dark_color = "#000"
+
 function getID(id) {
     return document.getElementById(id)
 }
@@ -35,7 +38,7 @@ function clear_source_canvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.beginPath();
     ctx.rect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'black';
+    ctx.fillStyle = dark_color;
     ctx.fill();
 
     return ctx;
@@ -47,7 +50,7 @@ function render_circle() {
 
     ctx.beginPath();
     ctx.arc(canvas.width/2, canvas.height/2, 80, 0, 2 * Math.PI, false);
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = light_color;
     ctx.fill();
 
     demo_one_render();
@@ -59,7 +62,7 @@ function render_square() {
 
     ctx.beginPath();
     ctx.rect(canvas.width/2-80, canvas.height/2-80, 160, 160);
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = light_color;
     ctx.fill();
 
     demo_one_render();
@@ -77,7 +80,7 @@ function render_triangle() {
     ctx.lineTo(w/2-100, h/2+50);
     ctx.lineTo(w/2+50, h/2+50);
     ctx.closePath();
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = light_color;
     ctx.fill();
 
     demo_one_render();
