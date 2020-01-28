@@ -1,6 +1,6 @@
 import * as wasm from "autostereograms-rs";
 
-wasm.debug();
+// wasm.debug();
 
 function getID(id) {
     return document.getElementById(id)
@@ -19,8 +19,6 @@ function demo_one_render() {
 
     canvas.width = w;
     canvas.height = h;
-
-    console.log("Canvas height is", h, "width is", w);
 
     wasm.render_ctx(source_ctx, ctx, w, h, true, 3, seed);
 }

@@ -7,12 +7,17 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::{Clamped, JsCast, JsValue};
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, HtmlImageElement, ImageData};
 
+static mut DEBUG: bool = false;
 const DPI: u32 = 72;
 
 // A macro to provide `println!(..)`-style syntax for `console.log` logging.
 macro_rules! log {
     ( $( $t:tt )* ) => {
-        web_sys::console::log_1(&format!( $( $t )* ).into());
+        unsafe {
+            if DEBUG {
+                web_sys::console::log_1(&format!( $( $t )* ).into());
+            }
+        }
     }
 }
 
@@ -41,6 +46,9 @@ extern "C" {}
 
 #[wasm_bindgen]
 pub fn debug() {
+    unsafe {
+        DEBUG=true;
+    };
     log!("Enabling panic hook");
     utils::set_panic_hook();
 }
