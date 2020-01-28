@@ -4,8 +4,7 @@ use rand::rngs::SmallRng;
 use rand::seq::SliceRandom;
 use rand::{Rng, SeedableRng};
 use wasm_bindgen::prelude::*;
-use wasm_bindgen::Clamped;
-use wasm_bindgen::JsCast;
+use wasm_bindgen::{Clamped, JsCast, JsValue};
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, HtmlImageElement, ImageData};
 
 const DPI: u32 = 72;
@@ -339,5 +338,200 @@ impl Stereogram {
         }
 
         pixel_data
+    }
+}
+
+
+const LIGHT_COLOR: &'static str = "#7f7f7f";
+const DARK_COLOR: &'static str = "#000";
+
+const SNEK_INIT_LENGTH: u32 = 3;
+
+#[derive(Clone, Copy, Debug)]
+enum SnekDirection {
+    Up,
+    Down,
+    Left,
+    Right,
+}
+
+impl SnekDirection {
+    fn is_up(self) -> bool {
+        use SnekDirection::*;
+
+        match self {
+            Up => true,
+            _ => false,
+        }
+    }
+
+    fn is_down(self) -> bool {
+        use SnekDirection::*;
+
+        match self {
+            Down => true,
+            _ => false,
+        }
+    }
+
+    fn is_left(self) -> bool {
+        use SnekDirection::*;
+
+        match self {
+            Left => true,
+            _ => false,
+        }
+    }
+
+    fn is_right(self) -> bool {
+        use SnekDirection::*;
+
+        match self {
+            Right => true,
+            _ => false,
+        }
+    }
+
+    fn is_same(self, other: SnekDirection) -> bool {
+        use SnekDirection::*;
+
+        match (self, other) {
+            (Up, Up) => true,
+            (Down, Down) => true,
+            (Left, Left) => true,
+            (Right, Right) => true,
+            _ => false,
+        }
+    }
+}
+
+struct SnekSegment {
+    x: u32,
+    y: u32,
+    resolution: u32,
+    direction: SnekDirection,
+}
+
+impl SnekSegment {
+    fn new(x: u32, y: u32, resolution: u32, direction: SnekDirection) -> Self {
+        Self{x, y, resolution, direction}
+    }
+
+    fn turn(&mut self, direction_string: String) {
+        use SnekDirection::*;
+
+        match (&direction_string[..], self.direction) {
+            ("up", Down) => (),
+            ("up", _) => self.direction = Up,
+
+            ("down", Up) => (),
+            ("down", _) => self.direction = Down,
+
+            ("right", Left) => (),
+            ("right", _) => self.direction = Right,
+
+            ("left", Right) => (),
+            ("left", _) => self.direction = Left,
+
+            _ => (),
+        }
+    }
+
+    fn render(&self, ctx: &CanvasRenderingContext2d) {
+        log!("Rendering segment @ {}:{} -> {:?}", self.x, self.y, self.direction);
+        ctx.begin_path();
+        ctx.arc((self.x * self.resolution) as f64, (self.y * self.resolution) as f64, (self.resolution/2) as f64, std::f64::consts::PI * 2.0, 0.0).expect("Could not render a segment");
+        ctx.set_fill_style(&JsValue::from(LIGHT_COLOR));
+        ctx.fill();
+    }
+
+    fn tick(&mut self) {
+        use SnekDirection::*;
+
+        match self.direction {
+            Up => self.y-=1,
+            Down => self.y+=1,
+            Left => self.x-=1,
+            Right => self.x+=1,
+        }
+    }
+}
+
+#[wasm_bindgen]
+pub struct SnekGame {
+    w: u32,
+    h: u32,
+    resolution: u32,
+    snek: Vec<SnekSegment>,
+}
+
+#[wasm_bindgen]
+impl SnekGame {
+    pub fn new(w: u32, h: u32, resolution: u32) -> Self {
+        let direction = SnekDirection::Up;
+        let mut snek = vec![];
+        for i in 0..SNEK_INIT_LENGTH {
+            snek.push(SnekSegment::new(h/2/resolution, w/2/resolution+i, resolution, direction))
+        }
+
+
+        Self{w, h, snek, resolution}
+    }
+
+    fn clear(&self, ctx: &CanvasRenderingContext2d) {
+        log!("Cleaninng canvas for snek");
+        ctx.begin_path();
+        ctx.clear_rect(0.0, 0.0, self.w as f64, self.h as f64);
+        ctx.rect(0.0, 0.0, self.w as f64, self.h as f64);
+        ctx.set_fill_style(&JsValue::from(DARK_COLOR));
+        ctx.fill();
+    }
+
+    pub fn turn(&mut self, direction_string: String) {
+        use SnekDirection::*;
+
+        let mut direction = self.snek[0].direction;
+
+        match (&direction_string[..], direction) {
+            ("up", Down) => (),
+            ("up", _) => direction = Up,
+
+            ("down", Up) => (),
+            ("down", _) => direction = Down,
+
+            ("right", Left) => (),
+            ("right", _) => direction = Right,
+
+            ("left", Right) => (),
+            ("left", _) => direction = Left,
+
+            _ => (),
+        }
+
+        log!("Turning head to {:?}", direction);
+
+        self.snek[0].direction = direction;
+    }
+
+    pub fn render(&self, ctx: &CanvasRenderingContext2d) {
+        self.clear(ctx);
+
+        for segment in &self.snek {
+            segment.render(ctx);
+        }
+    }
+
+    pub fn tick(&mut self) {
+        for segment in &mut self.snek {
+            segment.tick();
+        }
+
+        for i in 0..(self.snek.len()-1) {
+            if !self.snek[i+1].direction.is_same(self.snek[i].direction) {
+                log!("Swapping direction {:?} -> {:?}", self.snek[i+1].direction, self.snek[i].direction);
+                self.snek[i+1].direction=self.snek[i].direction;
+                break;
+            }
+        }
     }
 }

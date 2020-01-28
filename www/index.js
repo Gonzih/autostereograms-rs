@@ -2,9 +2,6 @@ import * as wasm from "autostereograms-rs";
 
 wasm.debug();
 
-let light_color = "#cdcdcd"
-let dark_color = "#000"
-
 function getID(id) {
     return document.getElementById(id)
 }
@@ -28,69 +25,6 @@ function demo_one_render() {
     wasm.render_ctx(source_ctx, ctx, w, h, true, 3, seed);
 }
 
-function init_demo_one() {
-    render_circle();
-}
-
-function clear_source_canvas() {
-    let canvas = getID("source-one");
-    let ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.beginPath();
-    ctx.rect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = dark_color;
-    ctx.fill();
-
-    return ctx;
-}
-
-function render_circle() {
-    let canvas = getID("source-one");
-    let ctx = clear_source_canvas();
-
-    ctx.beginPath();
-    ctx.arc(canvas.width/2, canvas.height/2, 80, 0, 2 * Math.PI, false);
-    ctx.fillStyle = light_color;
-    ctx.fill();
-
-    demo_one_render();
-}
-
-function render_square() {
-    let canvas = getID("source-one");
-    let ctx = clear_source_canvas();
-
-    ctx.beginPath();
-    ctx.rect(canvas.width/2-80, canvas.height/2-80, 160, 160);
-    ctx.fillStyle = light_color;
-    ctx.fill();
-
-    demo_one_render();
-}
-
-function render_triangle() {
-    let canvas = getID("source-one");
-    let ctx = clear_source_canvas();
-    let w = canvas.width;
-    let h = canvas.height;
-
-    ctx.beginPath();
-    ctx.beginPath();
-    ctx.moveTo(w/2-100, h/2-100);
-    ctx.lineTo(w/2-100, h/2+50);
-    ctx.lineTo(w/2+50, h/2+50);
-    ctx.closePath();
-    ctx.fillStyle = light_color;
-    ctx.fill();
-
-    demo_one_render();
-}
-
-init_demo_one();
-getID("demo-one-circle").onclick = render_circle;
-getID("demo-one-square").onclick = render_square;
-getID("demo-one-triangle").onclick = render_triangle;
-
 function showorigin() {
     getID("demo-one-img-wrapper").style.display = "block";
     getID("demo-one-target-wrapper").style.display = "none";
@@ -109,4 +43,56 @@ function showcanvas() {
 
 getID("demo-one-show-origin").onclick = showorigin;
 getID("demo-one-show-canvas").onclick = showcanvas;
-showcanvas();
+
+// showcanvas();
+showorigin();
+
+let snek;
+let running;
+
+function tick() {
+    let canvas = getID("source-one");
+    let ctx = canvas.getContext("2d");
+
+    snek.tick();
+    snek.render(ctx);
+
+    demo_one_render();
+
+    if (running) {
+        setTimeout(tick, 3000);
+    }
+}
+
+function new_game() {
+    let canvas = getID("source-one");
+    snek = wasm.SnekGame.new(canvas.width, canvas.height, 20);
+    running = true;
+    tick();
+}
+function stop_game() { running = false; }
+
+document.onkeydown = function(e) {
+    e = e || window.event;
+    switch(e.which || e.keyCode) {
+        case 37: snek.turn("left");
+        break;
+
+        case 38: snek.turn("up");
+        break;
+
+        case 39: snek.turn("right");
+        break;
+
+        case 40: snek.turn("down");
+        break;
+
+        default: return;
+    }
+    e.preventDefault();
+};
+
+getID("start").onclick = new_game;
+getID("stop").onclick = stop_game;
+
+new_game();
