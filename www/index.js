@@ -44,8 +44,8 @@ function showcanvas() {
 getID("demo-one-show-origin").onclick = showorigin;
 getID("demo-one-show-canvas").onclick = showcanvas;
 
-showcanvas();
-// showorigin();
+// showcanvas();
+showorigin();
 
 let snek;
 let running;
@@ -54,19 +54,23 @@ function tick() {
     let canvas = getID("source-one");
     let ctx = canvas.getContext("2d");
 
-    snek.tick();
+    let can_continue = snek.tick();
     snek.render(ctx);
 
     demo_one_render();
 
     if (running) {
-        setTimeout(tick, 1000);
+        if (can_continue) {
+            setTimeout(tick, 1000);
+        } else {
+            setTimeout(new_game, 1000);
+        }
     }
 }
 
 function new_game() {
     let canvas = getID("source-one");
-    snek = wasm.SnekGame.new(canvas.width, canvas.height, 20);
+    snek = wasm.SnekGame.new(canvas.width, canvas.height, 50);
     running = true;
     tick();
 }

@@ -342,10 +342,11 @@ impl Stereogram {
 }
 
 
-const LIGHT_COLOR: &'static str = "#7f7f7f";
+const LIGHT_COLOR: &'static str = "#cdcdcd";
 const DARK_COLOR: &'static str = "#000";
 
-const SNEK_INIT_LENGTH: u32 = 5;
+const SNEK_INIT_LENGTH: u32 = 3;
+const APPLES_LIMIT: u32 = 5;
 
 #[derive(Clone, Copy, Debug)]
 enum SnekDirection {
@@ -369,6 +370,7 @@ impl SnekDirection {
     }
 }
 
+#[derive(Copy, Clone, Debug)]
 struct SnekSegment {
     x: u32,
     y: u32,
@@ -401,6 +403,21 @@ impl SnekSegment {
         }
     }
 
+    fn extend(&self) -> Self {
+        use SnekDirection::*;
+
+        let mut new = self.clone();
+
+        match self.direction {
+            Up => new.y += 1,
+            Down => new.y -= 1,
+            Left => new.x += 1,
+            Right => new.x -= 1,
+        };
+
+        new
+    }
+
     fn render(&self, ctx: &CanvasRenderingContext2d) {
         log!("Rendering segment @ {}:{} -> {:?}", self.x, self.y, self.direction);
         ctx.begin_path();
@@ -419,6 +436,40 @@ impl SnekSegment {
             Right => self.x+=1,
         }
     }
+
+    fn can_eat(&self, apple: &Apple) -> bool {
+        self.x == apple.x && self.y == apple.y
+    }
+
+    fn collision(&self, other: &SnekSegment) -> bool {
+        self.x == other.x && self.y == other.y
+    }
+}
+
+struct Apple {
+    x: u32,
+    y: u32,
+    resolution: u32,
+}
+
+impl Apple {
+    fn new(x_limit: u32, y_limit: u32, resolution: u32) -> Self {
+        let x = rand::thread_rng().gen_range(2, x_limit-2);
+        let y = rand::thread_rng().gen_range(2, y_limit-2);
+        Self{x, y, resolution}
+    }
+
+    fn render(&self, ctx: &CanvasRenderingContext2d) {
+        log!("Rendering apple @ {}:{}", self.x, self.y);
+        ctx.begin_path();
+        ctx.arc((self.x * self.resolution) as f64, (self.y * self.resolution) as f64, (self.resolution/2) as f64, std::f64::consts::PI * 2.0, 0.0).expect("Could not render an apple");
+        ctx.set_fill_style(&JsValue::from(LIGHT_COLOR));
+        ctx.fill();
+    }
+
+    fn overlaps(&self, apple: &Apple) -> bool {
+        self.x == apple.x && self.y == apple.y
+    }
 }
 
 #[wasm_bindgen]
@@ -426,6 +477,7 @@ pub struct SnekGame {
     w: u32,
     h: u32,
     snek: Vec<SnekSegment>,
+    apples: Vec<Apple>,
 }
 
 #[wasm_bindgen]
@@ -437,8 +489,18 @@ impl SnekGame {
             snek.push(SnekSegment::new(h/2/resolution, w/2/resolution+i, resolution, direction))
         }
 
+        let mut apples: Vec<Apple> = vec![];
+        for _ in 0..APPLES_LIMIT {
+            let apple = Apple::new(h/resolution, w/resolution, resolution);
 
-        Self{w, h, snek}
+            if !snek.iter().any(|seg| seg.can_eat(&apple)) &&
+                !apples.iter().any(|app| app.overlaps(&apple)) {
+                apples.push(apple)
+            }
+        }
+
+
+        Self{w, h, snek, apples}
     }
 
     fn clear(&self, ctx: &CanvasRenderingContext2d) {
@@ -479,12 +541,16 @@ impl SnekGame {
     pub fn render(&self, ctx: &CanvasRenderingContext2d) {
         self.clear(ctx);
 
+        for apple in &self.apples {
+            apple.render(ctx);
+        }
+
         for segment in &self.snek {
             segment.render(ctx);
         }
     }
 
-    pub fn tick(&mut self) {
+    pub fn tick(&mut self) -> bool {
         for segment in &mut self.snek {
             segment.tick();
         }
@@ -492,5 +558,20 @@ impl SnekGame {
         for i in (0..(self.snek.len()-1)).rev() {
             self.snek[i+1].direction=self.snek[i].direction;
         }
+
+        let head = &self.snek[0];
+        let apple_i = self.apples.iter().position(|apple| head.can_eat(&apple));
+        if let Some(i) =  apple_i {
+            let segment = self.snek.last().expect("Last element should be present").extend();
+            log!("Created new segment {:?}", segment);
+            self.apples.remove(i);
+            self.snek.push(segment);
+        }
+
+        let head = &self.snek[0];
+        let self_collision = self.snek.iter().any(|seg| seg.collision(head));
+
+        let head = &self.snek[0];
+        self_collision || head.x <  0 || head.y < 0
     }
 }
