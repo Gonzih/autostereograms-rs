@@ -44,8 +44,8 @@ function showcanvas() {
 getID("demo-one-show-origin").onclick = showorigin;
 getID("demo-one-show-canvas").onclick = showcanvas;
 
-// showcanvas();
-showorigin();
+showcanvas();
+// showorigin();
 
 let snek;
 let running;
@@ -61,9 +61,9 @@ function tick() {
 
     if (running) {
         if (can_continue) {
-            setTimeout(tick, 1000);
+            setTimeout(tick, 200);
         } else {
-            setTimeout(new_game, 1000);
+            setTimeout(new_game, 200);
         }
     }
 }
