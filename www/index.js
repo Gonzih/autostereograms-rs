@@ -44,8 +44,8 @@ function showcanvas() {
 getID("demo-one-show-origin").onclick = showorigin;
 getID("demo-one-show-canvas").onclick = showcanvas;
 
-// showcanvas();
-showorigin();
+showcanvas();
+// showorigin();
 
 let snek;
 let running;
@@ -60,7 +60,7 @@ function tick() {
     demo_one_render();
 
     if (running) {
-        setTimeout(tick, 3000);
+        setTimeout(tick, 1000);
     }
 }
 

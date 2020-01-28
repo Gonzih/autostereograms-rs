@@ -345,7 +345,7 @@ impl Stereogram {
 const LIGHT_COLOR: &'static str = "#7f7f7f";
 const DARK_COLOR: &'static str = "#000";
 
-const SNEK_INIT_LENGTH: u32 = 3;
+const SNEK_INIT_LENGTH: u32 = 5;
 
 #[derive(Clone, Copy, Debug)]
 enum SnekDirection {
@@ -356,43 +356,7 @@ enum SnekDirection {
 }
 
 impl SnekDirection {
-    fn is_up(self) -> bool {
-        use SnekDirection::*;
-
-        match self {
-            Up => true,
-            _ => false,
-        }
-    }
-
-    fn is_down(self) -> bool {
-        use SnekDirection::*;
-
-        match self {
-            Down => true,
-            _ => false,
-        }
-    }
-
-    fn is_left(self) -> bool {
-        use SnekDirection::*;
-
-        match self {
-            Left => true,
-            _ => false,
-        }
-    }
-
-    fn is_right(self) -> bool {
-        use SnekDirection::*;
-
-        match self {
-            Right => true,
-            _ => false,
-        }
-    }
-
-    fn is_same(self, other: SnekDirection) -> bool {
+    fn is_the_same(self, other: SnekDirection) -> bool {
         use SnekDirection::*;
 
         match (self, other) {
@@ -461,7 +425,6 @@ impl SnekSegment {
 pub struct SnekGame {
     w: u32,
     h: u32,
-    resolution: u32,
     snek: Vec<SnekSegment>,
 }
 
@@ -475,7 +438,7 @@ impl SnekGame {
         }
 
 
-        Self{w, h, snek, resolution}
+        Self{w, h, snek}
     }
 
     fn clear(&self, ctx: &CanvasRenderingContext2d) {
@@ -526,12 +489,8 @@ impl SnekGame {
             segment.tick();
         }
 
-        for i in 0..(self.snek.len()-1) {
-            if !self.snek[i+1].direction.is_same(self.snek[i].direction) {
-                log!("Swapping direction {:?} -> {:?}", self.snek[i+1].direction, self.snek[i].direction);
-                self.snek[i+1].direction=self.snek[i].direction;
-                break;
-            }
+        for i in (0..(self.snek.len()-1)).rev() {
+            self.snek[i+1].direction=self.snek[i].direction;
         }
     }
 }
