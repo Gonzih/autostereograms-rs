@@ -3,7 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Autostereograms!</title>
+
+    <meta name="description" content="Autostereograms as a rendering mechanism for moving elements (game in this case).">
+    <meta name="keywords" content="Rust,Canvas,Stereograms,Autostereograms,HTML,JavaScript,WASM,WebAssembly">
+    <meta name="author" content="Max Gonzih">
+    <title>Rendering in Autostereograms!</title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css"></link>
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
@@ -14,6 +18,8 @@
               <div class="content">
                   <button class="button" id="demo-one-show-origin">Show original image</button>
                   <button class="button" id="demo-one-show-canvas">Show stereogram</button>
+                  <button class="button" id="start">START</button>
+                  <button class="button" id="stop">STOP</button>
               </div>
 
               <div class="content">
@@ -28,8 +34,20 @@
 
 
               <div class="content">
-                  <button class="button" id="start">START</button>
-                  <button class="button" id="stop">STOP</button>
+                  <h2>What is this?</h2>
+                  <p>
+                  This a simple snake like game rendered using <a href="https://en.wikipedia.org/wiki/Autostereogram" target=_blank>Autostereogram</a>.
+                  I recently rediscovered Autostereograms and after some research realized that I was always viewing them uing cross pattern, which is incorrect method.
+                  After some research I found a <a href="https://www2.cs.sfu.ca/CourseCentral/414/li/material/refs/SIRDS-Computer-94.pdf" target=_blank>paper</a> that had algorithm for stereogram generation in C, I decided to try to duplicate this algorithm to see if it would be possible to render moving objects using this technique.
+                  Both game and rendering algorithm are implemented in rust and are running on WASM in your browser. Source code can be found <a href="https://github.com/Gonzih/autostereograms-rs" target=_blank>here</a>.
+                  At the moment my main struggle is the fact that I still can't view them correctly, so validating accuracy of my algorithm is only possible with outside help, which slows things drastically.
+                  Also im not sure where is my implementation off, but people report some "fuzzines" around the endegs which at the moment I'm not sure how to fix.
+                  </p>
+
+
+                  <p>
+                  Big thanks to author of <a href="https://peeinears.github.io/MagicEye.js/" target=_blank>MagicEye.js</a> library which I used to compare my implementation against and used as a base for my canvas manipulation code.
+                  </p>
               </div>
           </div>
       </section>
