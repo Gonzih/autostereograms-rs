@@ -70,14 +70,29 @@
 /******/ 					"__wbg_error_4bb6c2a97407129a": function(p0i32,p1i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbg_error_4bb6c2a97407129a"](p0i32,p1i32);
 /******/ 					},
-/******/ 					"__widl_f_log_1_": function(p0i32) {
-/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_log_1_"](p0i32);
+/******/ 					"__widl_f_begin_path_CanvasRenderingContext2D": function(p0i32) {
+/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_begin_path_CanvasRenderingContext2D"](p0i32);
+/******/ 					},
+/******/ 					"__widl_f_fill_CanvasRenderingContext2D": function(p0i32) {
+/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_fill_CanvasRenderingContext2D"](p0i32);
+/******/ 					},
+/******/ 					"__widl_f_set_fill_style_CanvasRenderingContext2D": function(p0i32,p1i32) {
+/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_set_fill_style_CanvasRenderingContext2D"](p0i32,p1i32);
 /******/ 					},
 /******/ 					"__widl_f_get_image_data_CanvasRenderingContext2D": function(p0i32,p1f64,p2f64,p3f64,p4f64) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_get_image_data_CanvasRenderingContext2D"](p0i32,p1f64,p2f64,p3f64,p4f64);
 /******/ 					},
 /******/ 					"__widl_f_put_image_data_CanvasRenderingContext2D": function(p0i32,p1i32,p2f64,p3f64) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_put_image_data_CanvasRenderingContext2D"](p0i32,p1i32,p2f64,p3f64);
+/******/ 					},
+/******/ 					"__widl_f_arc_CanvasRenderingContext2D": function(p0i32,p1f64,p2f64,p3f64,p4f64,p5f64) {
+/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_arc_CanvasRenderingContext2D"](p0i32,p1f64,p2f64,p3f64,p4f64,p5f64);
+/******/ 					},
+/******/ 					"__widl_f_rect_CanvasRenderingContext2D": function(p0i32,p1f64,p2f64,p3f64,p4f64) {
+/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_rect_CanvasRenderingContext2D"](p0i32,p1f64,p2f64,p3f64,p4f64);
+/******/ 					},
+/******/ 					"__widl_f_clear_rect_CanvasRenderingContext2D": function(p0i32,p1f64,p2f64,p3f64,p4f64) {
+/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_clear_rect_CanvasRenderingContext2D"](p0i32,p1f64,p2f64,p3f64,p4f64);
 /******/ 					},
 /******/ 					"__widl_f_new_with_u8_clamped_array_and_sh_ImageData": function(p0i32,p1i32,p2i32,p3i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_new_with_u8_clamped_array_and_sh_ImageData"](p0i32,p1i32,p2i32,p3i32);
@@ -93,6 +108,9 @@
 /******/ 					},
 /******/ 					"__widl_f_performance_Window": function(p0i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_performance_Window"](p0i32);
+/******/ 					},
+/******/ 					"__widl_f_log_1_": function(p0i32) {
+/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__widl_f_log_1_"](p0i32);
 /******/ 					},
 /******/ 					"__wbg_newnoargs_c4b2cbbd30e2d057": function(p0i32,p1i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbg_newnoargs_c4b2cbbd30e2d057"](p0i32,p1i32);
@@ -225,7 +243,7 @@
 /******/ 				promises.push(installedWasmModuleData);
 /******/ 			else {
 /******/ 				var importObject = wasmImportObjects[wasmModuleId]();
-/******/ 				var req = fetch(__webpack_require__.p + "" + {"../pkg/autostereograms_rs_bg.wasm":"6e3dba137e9952c6da06"}[wasmModuleId] + ".module.wasm");
+/******/ 				var req = fetch(__webpack_require__.p + "" + {"../pkg/autostereograms_rs_bg.wasm":"398b320f03429fced0ff"}[wasmModuleId] + ".module.wasm");
 /******/ 				var promise;
 /******/ 				if(importObject instanceof Promise && typeof WebAssembly.compileStreaming === 'function') {
 /******/ 					promise = Promise.all([WebAssembly.compileStreaming(req), importObject]).then(function(items) {
