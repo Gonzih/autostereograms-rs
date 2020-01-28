@@ -136,6 +136,24 @@
 /******/ 					"__wbindgen_object_clone_ref": function(p0i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbindgen_object_clone_ref"](p0i32);
 /******/ 					},
+/******/ 					"__wbg_self_1b7a39e3a92c949c": function() {
+/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbg_self_1b7a39e3a92c949c"]();
+/******/ 					},
+/******/ 					"__wbg_require_604837428532a733": function(p0i32,p1i32) {
+/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbg_require_604837428532a733"](p0i32,p1i32);
+/******/ 					},
+/******/ 					"__wbg_crypto_968f1772287e2df0": function(p0i32) {
+/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbg_crypto_968f1772287e2df0"](p0i32);
+/******/ 					},
+/******/ 					"__wbg_getRandomValues_a3d34b4fee3c2869": function(p0i32) {
+/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbg_getRandomValues_a3d34b4fee3c2869"](p0i32);
+/******/ 					},
+/******/ 					"__wbg_getRandomValues_f5e14ab7ac8e995d": function(p0i32,p1i32,p2i32) {
+/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbg_getRandomValues_f5e14ab7ac8e995d"](p0i32,p1i32,p2i32);
+/******/ 					},
+/******/ 					"__wbg_randomFillSync_d5bd2d655fdf256a": function(p0i32,p1i32,p2i32) {
+/******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbg_randomFillSync_d5bd2d655fdf256a"](p0i32,p1i32,p2i32);
+/******/ 					},
 /******/ 					"__wbindgen_debug_string": function(p0i32,p1i32) {
 /******/ 						return installedModules["../pkg/autostereograms_rs.js"].exports["__wbindgen_debug_string"](p0i32,p1i32);
 /******/ 					},
@@ -243,7 +261,7 @@
 /******/ 				promises.push(installedWasmModuleData);
 /******/ 			else {
 /******/ 				var importObject = wasmImportObjects[wasmModuleId]();
-/******/ 				var req = fetch(__webpack_require__.p + "" + {"../pkg/autostereograms_rs_bg.wasm":"3af8d14a0e986af75f91"}[wasmModuleId] + ".module.wasm");
+/******/ 				var req = fetch(__webpack_require__.p + "" + {"../pkg/autostereograms_rs_bg.wasm":"a7760b9746f987613f5d"}[wasmModuleId] + ".module.wasm");
 /******/ 				var promise;
 /******/ 				if(importObject instanceof Promise && typeof WebAssembly.compileStreaming === 'function') {
 /******/ 					promise = Promise.all([WebAssembly.compileStreaming(req), importObject]).then(function(items) {
