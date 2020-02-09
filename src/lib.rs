@@ -47,7 +47,7 @@ extern "C" {}
 #[wasm_bindgen]
 pub fn debug() {
     unsafe {
-        DEBUG=true;
+        DEBUG = true;
     };
     log!("Enabling panic hook");
     utils::set_panic_hook();
@@ -66,11 +66,7 @@ impl Color {
     }
 
     fn random(rng: &mut SmallRng) -> Self {
-        Self::new(
-            rng.gen(),
-            rng.gen(),
-            rng.gen(),
-        )
+        Self::new(rng.gen(), rng.gen(), rng.gen())
     }
 }
 
@@ -349,7 +345,6 @@ impl Stereogram {
     }
 }
 
-
 const LIGHT_COLOR: &'static str = "#cdcdcd";
 const DARK_COLOR: &'static str = "#000";
 
@@ -388,7 +383,12 @@ struct SnekSegment {
 
 impl SnekSegment {
     fn new(x: i32, y: i32, resolution: i32, direction: SnekDirection) -> Self {
-        Self{x, y, resolution, direction}
+        Self {
+            x,
+            y,
+            resolution,
+            direction,
+        }
     }
 
     fn turn(&mut self, direction_string: String) {
@@ -427,9 +427,20 @@ impl SnekSegment {
     }
 
     fn render(&self, ctx: &CanvasRenderingContext2d) {
-        log!("Rendering segment @ {}:{} -> {:?}", self.x, self.y, self.direction);
+        log!(
+            "Rendering segment @ {}:{} -> {:?}",
+            self.x,
+            self.y,
+            self.direction
+        );
         ctx.begin_path();
-        ctx.arc((self.x * self.resolution) as f64, (self.y * self.resolution) as f64, (self.resolution/2) as f64, std::f64::consts::PI * 2.0, 0.0).expect("Could not render a segment");
+        let res = self.resolution as f64;
+        ctx.rect(
+            self.x as f64 * res - res / 2.0,
+            self.y as f64 * res - res / 2.0,
+            res,
+            res,
+        );
         ctx.set_fill_style(&JsValue::from(LIGHT_COLOR));
         ctx.fill();
     }
@@ -438,10 +449,10 @@ impl SnekSegment {
         use SnekDirection::*;
 
         match self.direction {
-            Up => self.y-=1,
-            Down => self.y+=1,
-            Left => self.x-=1,
-            Right => self.x+=1,
+            Up => self.y -= 1,
+            Down => self.y += 1,
+            Left => self.x -= 1,
+            Right => self.x += 1,
         }
     }
 
@@ -462,15 +473,22 @@ struct Apple {
 
 impl Apple {
     fn new(x_limit: i32, y_limit: i32, resolution: i32) -> Self {
-        let x = rand::thread_rng().gen_range(2, x_limit-2);
-        let y = rand::thread_rng().gen_range(2, y_limit-2);
-        Self{x, y, resolution}
+        let x = rand::thread_rng().gen_range(2, x_limit - 2);
+        let y = rand::thread_rng().gen_range(2, y_limit - 2);
+        Self { x, y, resolution }
     }
 
     fn render(&self, ctx: &CanvasRenderingContext2d) {
         log!("Rendering apple @ {}:{}", self.x, self.y);
         ctx.begin_path();
-        ctx.arc((self.x * self.resolution) as f64, (self.y * self.resolution) as f64, (self.resolution/2) as f64, std::f64::consts::PI * 2.0, 0.0).expect("Could not render an apple");
+        ctx.arc(
+            (self.x * self.resolution) as f64,
+            (self.y * self.resolution) as f64,
+            (self.resolution / 2) as f64,
+            std::f64::consts::PI * 2.0,
+            0.0,
+        )
+        .expect("Could not render an apple");
         ctx.set_fill_style(&JsValue::from(LIGHT_COLOR));
         ctx.fill();
     }
@@ -497,22 +515,36 @@ impl SnekGame {
         let direction = SnekDirection::Up;
         let mut snek = vec![];
         for i in 0..SNEK_INIT_LENGTH {
-            snek.push(SnekSegment::new(h/2/resolution, w/2/resolution+i, resolution, direction))
+            snek.push(SnekSegment::new(
+                h / 2 / resolution,
+                w / 2 / resolution + i,
+                resolution,
+                direction,
+            ))
         }
 
-        let wlimit = w/resolution;
-        let hlimit = h/resolution;
+        let wlimit = w / resolution;
+        let hlimit = h / resolution;
         let mut apples: Vec<Apple> = vec![];
         for _ in 0..APPLES_LIMIT {
             let apple = Apple::new(hlimit, wlimit, resolution);
 
-            if !snek.iter().any(|seg| seg.can_eat(&apple)) &&
-                !apples.iter().any(|app| app.overlaps(&apple)) {
+            if !snek.iter().any(|seg| seg.can_eat(&apple))
+                && !apples.iter().any(|app| app.overlaps(&apple))
+            {
                 apples.push(apple)
             }
         }
 
-        Self{w, h, wlimit, hlimit, snek, apples, resolution}
+        Self {
+            w,
+            h,
+            wlimit,
+            hlimit,
+            snek,
+            apples,
+            resolution,
+        }
     }
 
     fn clear(&self, ctx: &CanvasRenderingContext2d) {
@@ -567,14 +599,18 @@ impl SnekGame {
             segment.tick();
         }
 
-        for i in (0..(self.snek.len()-1)).rev() {
-            self.snek[i+1].direction=self.snek[i].direction;
+        for i in (0..(self.snek.len() - 1)).rev() {
+            self.snek[i + 1].direction = self.snek[i].direction;
         }
 
         let head = &self.snek[0];
         let apple_i = self.apples.iter().position(|apple| head.can_eat(&apple));
-        if let Some(i) =  apple_i {
-            let segment = self.snek.last().expect("Last element should be present").extend();
+        if let Some(i) = apple_i {
+            let segment = self
+                .snek
+                .last()
+                .expect("Last element should be present")
+                .extend();
             log!("Created new segment {:?}", segment);
             self.apples.remove(i);
             self.snek.push(segment);
@@ -582,10 +618,11 @@ impl SnekGame {
             loop {
                 let new_apple = Apple::new(self.hlimit, self.wlimit, self.resolution);
 
-                if !self.snek.iter().any(|seg| seg.can_eat(&new_apple)) &&
-                    !self.apples.iter().any(|app| app.overlaps(&new_apple)) {
-                        self.apples.push(new_apple);
-                        break;
+                if !self.snek.iter().any(|seg| seg.can_eat(&new_apple))
+                    && !self.apples.iter().any(|app| app.overlaps(&new_apple))
+                {
+                    self.apples.push(new_apple);
+                    break;
                 }
             }
 
@@ -595,9 +632,13 @@ impl SnekGame {
         let head = &self.snek[0];
         let self_collision = self.snek[1..].iter().any(|seg| seg.collision(head));
 
-
         let head = &self.snek[0];
-        log!("self_collision: {} || head.x < 0: {} || head.y < 0: {}", self_collision, head.x < 0, head.y < 0);
+        log!(
+            "self_collision: {} || head.x < 0: {} || head.y < 0: {}",
+            self_collision,
+            head.x < 0,
+            head.y < 0
+        );
         !self_collision && head.x > 0 && head.y > 0 && head.x < self.hlimit && head.y < self.wlimit
     }
 }
